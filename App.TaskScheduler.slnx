@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path=".github/copilot_instructions.md" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/copilot_instructions.md" />
+    <File Path="docs/index.md" />
+    <File Path="docs/quick_start.md" />
+    <File Path="docs/summary_v1.3.0.md" />
+    <File Path="docs/async_requirements_v1.2.0.md" />
+    <File Path="docs/copilot_instructions_additions.md" />
+    <File Path="docs/patterns_ddd.md" />
+    <File Path="docs/patterns_validation.md" />
+    <File Path="docs/patterns_testing.md" />
+    <File Path="requirements.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ConsoleApp/ConsoleApp.csproj" Id="50c84202-9e8a-4b0a-849a-6f74f0d630c1" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ConsoleApp.Tests/ConsoleApp.Tests.csproj" />
+  </Folder>
+</Solution>

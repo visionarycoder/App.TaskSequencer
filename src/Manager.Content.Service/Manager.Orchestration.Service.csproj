@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Manager.Orchestration.Contract/Manager.Orchestration.Contract.csproj" />
+    <ProjectReference Include="../Engine.Sequencing.Contract/Engine.Sequencing.Contract.csproj" />
+    <ProjectReference Include="../Access.DataModel.Contract/Access.DataModel.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

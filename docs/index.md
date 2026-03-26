@@ -16,6 +16,13 @@ metadata:
 
 ## 🎯 Core Documentation Files
 
+### 0. Architecture & Business Requirements
+**File**: `architecture.md`  
+**Purpose**: Solution design, development approach (Console app), business requirements, input CSV file specifications, task identity, execution model, dependency rules, and glossary  
+**Read First**: ⭐⭐⭐ YES — start here to understand what the system does before reading coding standards
+
+---
+
 ### 1. Main Instructions
 **File**: `README.md` (v1.3.1, ~50 KB)  
 **Purpose**: Comprehensive rules, standards, and requirements  
@@ -161,7 +168,8 @@ These rules are marked **CRITICAL** 🔴 in `README.md`:
 
 ```
 docs/
-├── README.md                    # ⭐ Start here (main instructions, 31 sections)
+├── architecture.md              # ⭐ Start here (solution design & business requirements)
+├── README.md                    # ⭐ Coding standards (main instructions, 31 sections)
 ├── CHANGELOG.md                 # Version history & changes
 ├── index.md                      # This file (navigation guide)
 ├── patterns_ddd.md              # Domain-Driven Design patterns

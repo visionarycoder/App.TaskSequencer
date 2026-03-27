@@ -11,15 +11,4 @@ public record TaskDefinition(
     IReadOnlySet<string> PrerequisiteIds,
     DateTime? StartTime,
     DateTime? EndTime
-)
-{
-    /// <summary>
-    /// Validates task has at least one timing anchor.
-    /// </summary>
-    public bool ValidateTimingRequirements() => StartTime.HasValue || EndTime.HasValue;
-
-    /// <summary>
-    /// Gets duration as TimeSpan.
-    /// </summary>
-    public TimeSpan GetDuration() => TimeSpan.FromMinutes(DurationMinutes);
-}
+);

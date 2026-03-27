@@ -1,0 +1,1325 @@
+# Technology Stack & Desktop GUI Requirements
+
+**Version**: 1.0  
+**Date**: March 26, 2026  
+**Status**: Requirements Stage (Implementation Pending)
+
+---
+
+## Executive Summary
+
+App.TaskSequencer Phase 2 introduces a modern distributed architecture combining Orleans distributed actors, Aspire cloud orchestration, and a native Windows 11 desktop GUI. The desktop application provides local sequence visualization, deadline reporting, and iterative refinement monitoring.
+
+---
+
+## Technology Decisions & Rationale
+
+### 1. Orleans 8.x
+
+**Why Orleans?**
+- Virtual actor model ideal for independent task calculations
+- Built-in grain persistence and reminders
+- Distributed transaction support (not needed here but available)
+- Rich monitoring/diagnostics
+- Microsoft-backed, production-tested in Azure services
+
+**Key Orleans Packages**:
+```xml
+<PackageReference Include="Microsoft.Orleans.Server" Version="8.*" />
+<PackageReference Include="Microsoft.Orleans.Core" Version="8.*" />
+<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.*" />
+```
+
+**Grain State Persistence** (Phase 2: memory-only, Phase 3+: SQLite/Azure Table Storage):
+```csharp
+// Phase 2: In-memory state
+siloBuilder.UseDashboard(options => { ... })
+           .ConfigureApplicationParts(parts => { ... });
+
+// Phase 3: Persistent state
+siloBuilder.AddSqliteGrainStorage("grain-storage", options => { ... });
+```
+
+---
+
+### 2. Microsoft Aspire
+
+**Why Aspire?**
+- Unified development experience for distributed apps
+- ServiceRegistry for inter-service discovery
+- Local dashboard showing service health
+- Environment variable injection
+- Container orchestration abstractions ready
+
+**Usage in Phase 2**:
+- Orchestrates Orleans silo startup
+- Hosts Orleans silo in console application or Windows service
+- Provides local development dashboard
+- Manages configuration injection
+
+**Key Aspire Packages**:
+```xml
+<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.*" />
+<PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="8.*" />
+```
+
+**Local Development**:
+```bash
+# Desktop app starts & initializes Orleans silo locally
+dotnet run --project DesktopApp/DesktopApp.csproj
+# Orleans silo embedded in desktop process
+# All calculations happen locally, no network calls
+```
+
+---
+
+### 3. WinUI 3 Desktop Application
+
+**Why WinUI 3?**
+- Modern Microsoft XAML framework for Windows 11
+- Native Win32 performance
+- Fluent Design System (modern Windows aesthetics)
+- Direct integration with .NET 8
+- Recommended by Microsoft for new Windows applications
+- Exceptional tooling in Visual Studio
+- Hardware-accelerated rendering
+
+**Why NOT Web/ASP.NET Core?**
+- Desktop application is completely local (no server needed)
+- Simpler deployment (single .exe/.msix)
+- No CORS, authentication, or HTTP complexity
+- Direct access to Orleans grains (in-process)
+- Native Windows integration (file pickers, notifications, etc.)
+
+**Architecture**:
+```
+WinUI 3 Desktop App (MainWindow.xaml)
+    ├─ ViewModels (MVVM pattern)
+    │  ├─ DashboardVM
+    │  ├─ TimelineVM
+    │  ├─ GroupsVM
+    │  └─ ViolationsVM
+    ├─ Services
+    │  └─ GrainClientService (Orleans integration)
+    ├─ Orleans Silo (embedded)
+    │  ├─ IExecutionInstanceGrain
+    │  ├─ IExecutionPlanOrchestratorGrain
+    │  ├─ ISequenceGroupGrain
+    │  └─ IReportGeneratorGrain
+    └─ CSV Parsing (Phase 1 reused)
+```
+
+**Key Packages**:
+```xml
+<!-- WinUI 3 / Windows App SDK -->
+<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.*" />
+<PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+<PackageReference Include="CommunityToolkit.WinUI.Controls.DataGrid" Version="8.*" />
+
+<!-- Windows integration -->
+<PackageReference Include="CommunityToolkit.WinUI" Version="8.*" />
+<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.*" />
+
+<!-- Orleans client (embedded in process, not remote) -->
+<PackageReference Include="Microsoft.Orleans.Client" Version="8.*" />
+```
+
+**Project Configuration**:
+```xml
+<!-- Desktop.csproj -->
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>msix</WindowsPackageType>
+    <WindowsPackageVersion>1.0.0.0</WindowsPackageVersion>
+  </PropertyGroup>
+</Project>
+```
+
+---
+
+### 4. Desktop Data Visualization: Timeline View
+
+**Requirement**: Display task execution Gantt chart directly in desktop window
+
+**Implementation Options**:
+
+#### Option A: Canvas-based (Custom Drawing)
+```csharp
+// MainWindow.xaml.cs
+private void OnCanvasRender(CanvasControl sender, CanvasDrawEventArgs args)
+{
+    // Draw timeline: X-axis = time, Y-axis = tasks
+    // Draw task rectangles with execution times
+    // Draw deadline lines in red
+    // Hit-test for mouse hover
+}
+```
+- **Pros**: Pixel-perfect control, fast performance for 1000+ tasks
+- **Cons**: More code to maintain
+- **Best for**: Visualization of 100–500 tasks initially
+
+#### Option B: DataGrid-based
+```xaml
+<!-- TimelineView.xaml -->
+<DataGrid x:Name="TaskGrid" ItemsSource="{x:Bind ViewModel.ExecutionInstances}">
+    <DataGrid.Columns>
+        <DataGridTextColumn Header="Task ID" Binding="{Binding InterfaceNumber}" Width="80" />
+        <DataGridTextColumn Header="Scheduled" Binding="{Binding ScheduledStartTime}" Width="120" />
+        <DataGridTextColumn Header="Duration" Binding="{Binding DurationMinutes}" Width="80" />
+        <DataGridTemplateColumn Header="Timeline" Width="300">
+            <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                    <Canvas Height="20" Background="Transparent">
+                        <!-- Draw  task bar at calculated position -->
+                        <Rectangle Fill="{Binding IsValid, Converter={StaticResource ValidityColorConverter}}"
+                                   Canvas.Left="{Binding VisualOffset}" Width="{Binding VisualWidth}" />
+                    </Canvas>
+                </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+    </DataGrid.Columns>
+</DataGrid>
+```
+- **Pros**: Familiar tabular UI, sortable/filterable
+- **Cons**: Row-based, not true Gantt
+- **Best for**: Detailed task inspection
+
+**Recommendation**: Start with Option B (DataGrid), add Canvas-based Option A for full timeline view in separate tab.
+
+---
+
+## Desktop GUI Component Architecture
+
+### Window 1: Main Dashboard
+
+**Layout**:
+```
+╔═══════════════════════════════════════════════════════╗
+║  App.TaskSequencer - Execution Plan Dashboard         ║
+╠═══════════════════════════════════════════════════════╣
+║ File Edit View Help                                   ║
+║ [Load CSV] [Refresh] [Export] [Settings]              ║
+╠═══════════════════════════════════════════════════════╣
+║                                                       ║
+║ ┌─ Execution Overview ──────────────────────────────┐ ║
+║ │ Total Tasks: 150      Valid: 145 (96%)           │ ║
+║ │ Invalid: 5 (4%)       Critical Path: 11.5 hours  │ ║
+║ └─────────────────────────────────────────────────┘ ║
+║                                                       ║
+║ ┌─ Convergence Progress ────────────────────────────┐ ║
+║ │ ✓ Round 1: 127 tasks shifted (+15 min avg)       │ ║
+║ │ ✓ Round 2: 18 tasks shifted (+3 min avg)         │ ║
+║ │ ✓ Round 3: 0 tasks shifted → CONVERGED          │ ║
+║ │ Total calculation time: 1.24 seconds             │ ║
+║ └─────────────────────────────────────────────────┘ ║
+║                                                       ║
+║ ┌─ Deadline Violations (5 total) ──────────────────┐ ║
+║ │ Task 42:  Completion 14:15 vs Deadline 14:00 ⚠️  │ ║
+║ │ Task 87:  Completion 11:45 vs Deadline 11:30 ⚠️  │ ║
+║ │ [Show all violations...]                         │ ║
+║ └─────────────────────────────────────────────────┘ ║
+║                                                       ║
+║ ┌─ Sequence Groups ────────────────────────────────┐ ║
+║ │ • PAYROLL (95 tasks)        [View Timeline]      │ ║
+║ │ • SETTLEMENT (40 tasks)     [View Timeline]      │ ║
+║ │ • REPORTING (15 tasks)      [View Timeline]      │ ║
+║ └─────────────────────────────────────────────────┘ ║
+║                                                       ║
+╚═══════════════════════════════════════════════════════╝
+```
+
+### Window 2: Timeline (Gantt Chart View)
+
+**Layout**:
+```
+╔═════════════════════════════════════════════════════════════╗
+║  Timeline: PAYROLL                          [← Back]        ║
+╠═════════════════════════════════════════════════════════════╣
+║ 06:00  07:00  08:00  09:00  10:00  11:00  12:00  [Scroll] ║
+║────────────────────────────────────────────────────────────║
+║ Task 1  [████─ Extract (120m)]                             ║
+║ Task 2  |      [─── Validate (60m)]                        ║
+║ Task 3  |           [██ Transform (90m)]                   ║
+║ Task 4  ⚠️ [RED Invalid: deadline]                         ║
+║ Task 5  |           |   [─ Load (45m)]                     ║
+║ Task 6  |           |      [─ Publish (30m)]               ║
+║ ...                                                         ║
+║ Task 95                               [Cleanup (15m)]      ║
+║                                                             ║
+║ Legend:                                                     ║
+║ [XXXXX] Estimated duration (15m default)                  ║
+║ [XXXXX] Actual duration (from history)                    ║
+║ ⚠️ RED = Invalid (deadline violation)                      ║
+║ | Deadline line                                            ║
+║                                                             ║
+╚═════════════════════════════════════════════════════════════╝
+```
+
+**Interactions**:
+- Right-click task → Show details, prerequisites, history
+- Hover → Tooltip with task name, duration, deadline status
+- Scroll →  Pan left/right through timeline
+- Zoom slider → Adjust time scale (1h per 100px, etc.)
+
+### Window 3: Violations Report
+
+**Layout**:
+```
+╔════════════════════════════════════════════════════════╗
+║  Deadline Violations Report                           ║
+╠════════════════════════════════════════════════════════╣
+║ [Filter by Group ▼] [Sort by ▼] [Export CSV] [Print] ║
+╠════════════════════════════════════════════════════════╣
+║                                                        ║
+║ Task │ Group      │ Comp    │ Deadline │ Miss  │ Info ║
+║──────┼────────────┼─────────┼──────────┼───────┼──────║
+║  42  │ REPORTING  │ 18:00   │  17:30   │ +30m  │ ℹ️  ║
+║  87  │ SETTLEMENT │ 11:45   │  11:30   │ +15m  │ ℹ️  ║
+║  55  │ PAYROLL    │ 14:05   │  14:00   │  +5m  │ ℹ️  ║
+║  71  │ SETTLEMENT │ 16:00   │  15:45   │ +15m  │ ℹ️  ║
+║  99  │ REPORTING  │ 21:00   │  20:30   │ +30m  │ ℹ️  ║
+║                                                        ║
+║ [Double-click row to view task details]               ║
+║                                                        ║
+╚════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Data Binding: ViewModel Pattern (MVVM)
+
+**DashboardViewModel.cs**:
+```csharp
+public class DashboardViewModel : ObservableObject
+{
+    [ObservableProperty]
+    private ExecutionPlanDto executionPlan;
+    
+    [ObservableProperty]
+    private int totalTasks;
+    
+    [ObservableProperty]
+    private int validTasks;
+    
+    [ObservableProperty]
+    private int invalidTasks;
+    
+    [ObservableProperty]
+    private ObservableCollection<ExecutionViolationDto> violations;
+    
+    [ObservableProperty]
+    private ObservableCollection<SequenceGroupSummaryDto> groups;
+    
+    [ObservableProperty]
+    private ConvergenceProgressDto convergenceProgress;
+    
+    [RelayCommand]
+    private async Task LoadCsvFiles()
+    {
+        // File picker → load CSV paths
+        var picker = new FileOpenPicker
+        {
+            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+            FileTypeFilter = { ".csv" }
+        };
+        picker.FileTypeFilter.Add(".csv");
+        
+        var files = await picker.PickMultipleFilesAsync();
+        if (files.Count < 2) return;
+        
+        // Initialize Orleans & calculate plan
+        await InitializeOrleansAndCalculateAsync(files);
+    }
+    
+    private async Task InitializeOrleansAndCalculateAsync(IList<StorageFile> csvFiles)
+    {
+        // Load CSVs
+        var taskDefs = await CsvParser.ParseTaskDefinitionsAsync(csvFiles[0]);
+        var intakeEvents = await CsvParser.ParseIntakeEventsAsync(csvFiles[1]);
+        
+        // Initialize Orleans orchestrator
+        var orchestrator = GrainFactory.GetGrain<IExecutionPlanOrchestratorGrain>("ExecutionPlan_Today");
+        var plan = await orchestrator.BuildExecutionPlanAsync("today", executionInstances);
+        
+        // Update UI
+        ExecutionPlan = new ExecutionPlanDto { /* ... */ };
+        UpdateStatistics();
+    }
+}
+```
+
+**MainWindow.xaml**:
+```xaml
+<Window x:Class="DesktopApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <TransitionCollection>
+        <EntranceThemeTransition />
+    </TransitionCollection>
+    
+    <Grid RowDefinitions="Auto,*">
+        <CommandBar Grid.Row="0">
+            <AppBarButton Icon="OpenFile" Label="Load CSV" 
+                         Command="{x:Bind ViewModel.LoadCsvFilesCommand}" />
+            <AppBarButton Icon="Refresh" Label="Refresh" />
+            <AppBarButton Icon="Save" Label="Export" />
+        </CommandBar>
+        
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Padding="20" Spacing="20">
+                
+                <!-- Dashboard Stats -->
+                <InfoBar Title="Execution Overview" IsOpen="True">
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                        <StackPanel>
+                            <TextBlock Text="Total Tasks" Class="SectionTitle" />
+                            <TextBlock Text="{x:Bind ViewModel.TotalTasks}" FontSize="24" FontWeight="Bold" />
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="Valid" Class="SectionTitle" />
+                            <TextBlock Text="{x:Bind ViewModel.ValidTasks}" FontSize="24" Foreground="Green" />
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="Invalid" Class="SectionTitle" />
+                            <TextBlock Text="{x:Bind ViewModel.InvalidTasks}" FontSize="24" Foreground="Red" />
+                        </StackPanel>
+                    </Grid>
+                </InfoBar>
+                
+                <!-- Convergence Progress -->
+                <ProgressRing IsActive="True" IsIndeterminate="True" />
+                <ItemsView ItemsSource="{x:Bind ViewModel.ConvergenceProgress.Rounds}">
+                    <ItemsView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Padding="10">
+                                <TextBlock Text="{Binding RoundNumber, StringFormat='Round {0}'}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding TasksChanged, StringFormat='{0} tasks changed position'}" />
+                                <ProgressBar Value="{Binding PercentComplete}" Height="4" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsView.ItemTemplate>
+                </ItemsView>
+                
+                <!-- Violations Table -->
+                <DataGrid ItemsSource="{x:Bind ViewModel.Violations}" 
+                          AutoGenerateColumns="False"
+                          ColumnHeaderHeight="40"
+                          Height="200">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Task" Binding="{Binding InterfaceNumber}" Width="60" />
+                        <DataGridTextColumn Header="Group" Binding="{Binding GroupId}" Width="100" />
+                        <DataGridTextColumn Header="Deadline" Binding="{Binding Deadline}" Width="100" />
+                        <DataGridTextColumn Header="Miss Amount" Binding="{Binding MissAmount}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                
+            </StackPanel>
+        </ScrollView>
+    </Grid>
+</Window>
+```
+
+---
+
+## Desktop Application Features
+
+### Feature 1: Local CSV File Loading
+- File picker dialog
+- Support for 3 CSV formats (Task Definitions, Intake Events, Duration Manifest)
+- Drag-and-drop CSV files onto window
+- Recent files list in File menu
+
+### Feature 2: Real-time Convergence Visualization
+- Progress bar showing Round 1, 2, 3...
+- Count of tasks adjusted each round
+- Estimated time to completion
+- Cancel button if calculation takes too long
+
+### Feature 3: Sequence Timeline Tab
+- Grouped by business domain (PAYROLL, SETTLEMENT, etc.)
+- Horizontal scrollable Gantt chart
+- Task bars colored by validity (green/red)
+- Deadline lines drawn at intake times
+- Right-click context menu for task details
+
+### Feature 4: Violation Highlighting
+- Table view of deadline misses
+- Filter/sort by severity
+- Export to CSV or print
+
+### Feature 5: Settings & User Preferences
+- Theme (Light/Dark mode)
+- CSV file directory (remember last location)
+- Display density (compact/comfortable/spacious)
+- Timezone override (for daily schedule calculations)
+
+### Feature 6: Help & Documentation
+- In-app help panel
+- View documentation files
+- About dialog
+
+---
+
+## Aspire Integration for Desktop
+
+**DesktopApp.csproj** Configuration:
+```xml
+<!-- Use Aspire for Orleans silo orchestration -->
+<ItemGroup>
+    <ProjectReference Include="../Orleans/Orleans.csproj" />
+</ItemGroup>
+```
+
+**Program.cs**:
+```csharp
+var host = new HostBuilder()
+    .ConfigureServices(services =>
+    {
+        // Add Orleans silo
+        services.AddOrleans((context, siloBuilder) =>
+        {
+            siloBuilder
+                .UseLocalhostClustering()
+                .ConfigureApplicationParts(parts =>
+                {
+                    parts.AddApplicationPart(typeof(ExecutionInstanceGrain).Assembly)
+                         .WithReferences();
+                })
+                .UseDashboard(options =>
+                {
+                    options.Port = 8080;  // Local dashboard at localhost:8080
+                });
+        });
+        
+        // Add desktop-specific services
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<DashboardViewModel>();
+        services.AddSingleton<IDialogService, WinUIDialogService>();
+        services.AddSingleton<IFileService, WinUIFileService>();
+    })
+    .Build();
+
+// Start Orleans silo
+await host.StartAsync();
+
+// Launch desktop app
+var mainWindow = host.Services.GetRequiredService<MainWindow>();
+mainWindow.Activate();
+
+await host.WaitForShutdownAsync();
+```
+
+---
+
+## Build & Deployment: Windows 11 Desktop
+
+### Development: MSIX Package (Local Install)
+
+```bash
+# Build desktop app
+dotnet publish -c Release -p:WindowsPackageVersion=1.0.0.0
+
+# Output: DesktopApp_1.0.0.0_x64.msix
+# Double-click to install on Windows 11
+```
+
+### Distribution Options (Phase 3+)
+
+1. **App Installer** (.appinstaller file)
+   - Auto-update capability
+   - Distributed via corporate file share
+   - Users install via .appinstaller file
+
+2. **Microsoft Store** (optional)
+   - Public distribution
+   - Requires code signing & Store submission
+   - Auto-update through Store
+
+3. **Stand-alone .exe**
+   - Traditional standalone executable
+   - Self-contained .NET runtime (larger file)
+   - No Store/MSIX packaging
+
+---
+
+## Performance & Resource Usage
+
+### Desktop Application Targets
+
+| Metric | Target | Notes |
+|--------|--------|-------|
+| Startup time | < 3 seconds | Orleans silo init + UI render |
+| CSV load (3 files) | < 1 second | 150–200 tasks |
+| Convergence calculation | < 5 seconds | 150 tasks, 3 rounds avg |
+| Timeline render (100 tasks visible) | < 500ms | Canvas or DataGrid|
+| Memory usage (idle) | < 200 MB | Orleans + WinUI 3 |
+| Memory usage (executing plan) | < 500 MB | 150 tasks + grain states |
+
+### Windows 11 System Requirements
+
+```xml
+<!-- Package.appxmanifest -->
+<MinimumOS Build="22621" />  <!-- Windows 11 build 22621+ -->
+<ProcessorArchitecture>x64</ProcessorArchitecture>
+<ProcessorArchitecture>arm64</ProcessorArchitecture>
+```
+
+- **RAM**: 4 GB minimum, 8 GB recommended
+- **.NET Runtime**: 8.0 or later (bundled with MSIX)
+- **Storage**: 150 MB (including .NET runtime)
+
+---
+
+## Security & File Access
+
+### Phase 2 (Single-User Desktop)
+
+- **No authentication** required
+- **Local file system access** via File Picker API
+- **No network access** (purely local Orleans silo)
+- **No data persistence** (memory-only grains, Phase 2)
+
+### Phase 3+ (Corporate Deployment)
+
+- Corporate network file access (SMB/UNC paths)
+- Optional: Windows Credential Manager integration
+- Optional: Audit logging to network file share
+- Optional: Active Directory group policies
+
+---
+
+## Testing Strategy
+
+### Unit Tests (Orleans Grains)
+
+```csharp
+[TestClass]
+public class ExecutionInstanceGrainTests
+{
+    private TestSilo _testSilo;
+    
+    [TestInitialize]
+    public async Task Setup()
+    {
+        _testSilo = new TestSilo();
+        await _testSilo.StartAsync();
+    }
+    
+    [TestMethod]
+    public async Task CalculateResolvedStartTime_WithPrerequisite_AdjustsStart()
+    {
+        // Arrange
+        var grain = _testSilo.GrainFactory
+            .GetGrain<IExecutionInstanceGrain>("Task2_Monday_090000");
+        
+        // Act
+        await grain.InitializeAsync(/* ... */);
+        var resolvedStart = await grain.CalculateResolvedStartTimeAsync();
+        
+        // Assert
+        Assert.IsTrue(resolvedStart > expectedMinimum);
+    }
+}
+```
+
+### Integration Tests (Desktop App)
+
+```csharp
+[TestClass]
+public class TimelineViewTests
+{
+    [TestMethod]
+    public async Task TimelineView_LoadsCsvAndRenders()
+    {
+        // Load test CSV files
+        var taskDefs = Path.Combine(TestData, "tasks.csv");
+        var intakeEvents = Path.Combine(TestData, "intake.csv");
+        
+        // Simulate UI interactions
+        var vm = new TimelineViewModel(grainFactory);
+        await vm.LoadCsvFilesCommand.ExecuteAsync(new[] { taskDefs, intakeEvents });
+        
+        // Assert timeline rendered
+        Assert.AreEqual(150, vm.ExecutionInstances.Count);
+        Assert.IsTrue(vm.ConvergenceProgress.HasConverged);
+    }
+}
+```
+
+### Manual Testing Scenarios
+
+1. **Simple Linear Chain**: Task A → B → C all on Monday
+2. **Diamond Dependency**: B & C depend on A; D depends on B & C
+3. **Deadline Violation**: Task scheduled too late to meet deadline
+4. **Multi-Round Convergence**: Adjustments needed across 3 rounds
+5. **CSV Parse Error**: Handle missing/invalid columns gracefully
+
+---
+
+## Technology Stack Summary Table
+
+| Layer | Technology | Version | Purpose |
+|-------|-----------|---------|---------|
+| **Backend: Distributed Computation** | Orleans | 8.x | Grain-based parallel execution |
+| **Backend: Desktop Orchestration** | Aspire / .NET Hosting | 8.x | Orleans silo embedded in desktop app |
+| **Frontend: Desktop GUI** | WinUI 3 | 1.5.x | Native Windows 11 UI |
+| **Frontend: UI Framework** | MVVM Toolkit | 8.x | ViewModel binding & commands |
+| **Frontend: Data Grid** | WinUI DataGrid | 8.x | Task list & violations table |
+| **Frontend: Charts** | Win2D / Canvas | 1.x | Custom Gantt chart rendering |
+| **Frontend: Dialogs** | WinUI Dialog Control | 1.5.x | File pickers, error dialogs |
+| **Data Format** | CSV (CsvHelper) | 31.x | CSV file parsing |
+
+---
+
+**Ready for Phase 2 Implementation: AWAITING APPROVAL**
+
+Desktop application will be a single Windows 11 executable (.msix package) providing local sequence visualization with embedded Orleans silo—no web server, no API, no external dependencies.
+
+---
+
+## Technology Decisions & Rationale
+
+### 1. Orleans 8.x
+
+**Why Orleans?**
+- Virtual actor model ideal for independent task calculations
+- Built-in grain persistence and reminders
+- Distributed transaction support (not needed here but available)
+- Rich monitoring/diagnostics
+- Microsoft-backed, production-tested in Azure services
+
+**Key Orleans Packages**:
+```xml
+<PackageReference Include="Microsoft.Orleans.Server" Version="8.*" />
+<PackageReference Include="Microsoft.Orleans.Core" Version="8.*" />
+<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.*" />
+<PackageReference Include="OrleansDashboard" Version="8.*" />  <!-- Local dev UI -->
+```
+
+**Grain State Persistence** (Phase 2: memory-only, Phase 3+: SQLite/Azure Table Storage):
+```csharp
+// Phase 2: In-memory state
+siloBuilder.UseDashboard(options => { ... })
+           .ConfigureApplicationParts(parts => { ... });
+
+// Phase 3: Persistent state
+siloBuilder.AddAzureTableGrainStorage("grain-storage", options => { ... });
+```
+
+---
+
+### 2. Microsoft Aspire
+
+**Why Aspire?**
+- Unified development experience for distributed apps
+- ServiceRegistry for inter-service discovery
+- Local dashboard showing service health
+- Environment variable injection
+- Container orchestration abstractions ready
+
+**Key Aspire Packages**:
+```xml
+<PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="8.*" />
+<PackageReference Include="Aspire.Hosting" Version="8.*" />
+<PackageReference Include="Aspire.Hosting.AppHost" Version="8.*" />
+```
+
+**Local Development**:
+```bash
+dotnet run --project AppHost/AppHost.csproj
+# Automatically starts:
+# - Orleans silo (localhost:11111)
+# - ASP.NET Core API (localhost:5001)
+# - React dev server (localhost:5173)
+# - Aspire dashboard (localhost:18888)
+```
+
+**Production Deployment** (future):
+- Azure Container Apps (serverless Kubernetes)
+- Kubernetes with Dapr sidecars
+- Service Bus for inter-service messaging
+
+---
+
+### 3. ASP.NET Core 8 Web API
+
+**Why ASP.NET Core?**
+- Native C# integration with Orleans grains
+- High-performance request handling
+- Built-in dependency injection
+- Structured logging
+- OpenAPI/Swagger support
+
+**Architecture**:
+```
+Controllers
+    ├─ ReportsController (GET execution plans)
+    ├─ GroupsController (GET group-specific data)
+    ├─ TimelineController (GET Gantt chart data)
+    └─ DeadlinesController (GET violation reports)
+         ↓
+Services (business logic)
+    └─ GrainClientService (Orleans integration)
+         ↓
+Orleans Grains (distributed calculation)
+```
+
+**Key Packages**:
+```xml
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.*" />
+<PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />  <!-- Swagger UI -->
+<PackageReference Include="Orleans.Client" Version="8.*" />
+```
+
+**API Response DTOs**:
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class ReportsController : ControllerBase
+{
+    [HttpGet("{reportId}")]
+    public async Task<ActionResult<ExecutionPlanDto>> GetReport(string reportId)
+    {
+        // Grain call → JSON response
+    }
+}
+```
+
+---
+
+### 4. React + Vite (Web Frontend)
+
+**Why React?**
+- Component-based UI ideal for complex dashboards
+- Strong ecosystem (charting, data tables, styling)
+- Developer experience (fast hot reload, great TypeScript support)
+- Vite provides extremely fast dev server
+
+**Why Vite over Create React App?**
+- 10-50x faster dev server startup
+- Instant HMR (Hot Module Reload)
+- Smaller bundle sizes
+- ESM-based, modern tooling
+
+**Architecture**:
+```
+src/
+├─ pages/
+│  ├─ Dashboard.tsx
+│  ├─ Groups.tsx
+│  ├─ Timeline.tsx
+│  └─ Violations.tsx
+├─ components/
+│  ├─ GanttChart.tsx (timeline visualization)
+│  ├─ TaskCard.tsx
+│  ├─ DeadlineIndicator.tsx
+│  └─ ConvergenceProgress.tsx
+├─ services/
+│  └─ apiClient.ts (HTTP calls to ASP.NET Core)
+├─ types/
+│  └─ execution-plan.ts (TypeScript interfaces)
+└─ App.tsx (routing)
+```
+
+**Key Packages**:
+```json
+{
+  "dependencies": {
+    "react": "^18.3",
+    "react-dom": "^18.3",
+    "react-router-dom": "^6.*",
+    "recharts": "^2.*",
+    "axios": "^1.*",
+    "tailwindcss": "^3.*",
+    "lucide-react": "^latest"
+  },
+  "devDependencies": {
+    "vite": "^5.*",
+    "typescript": "^5.*",
+    "@vitejs/plugin-react": "^4.*",
+    "tailwindcss": "^3.*",
+    "autoprefixer": "^10.*"
+  }
+}
+```
+
+---
+
+### 5. Styling & UI Libraries
+
+**Tailwind CSS**
+- Utility-first CSS framework
+- Rapid UI prototyping
+- Small production bundle
+- Built-in responsive design
+
+**Recharts** (for Gantt chart)
+```tsx
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+
+export function TimelineView({ executionInstances }) {
+  return (
+    <BarChart data={transformToGanttData(executionInstances)}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis type="number" domain={['dataMin', 'dataMax']} />
+      <YAxis dataKey="taskId" type="category" />
+      <Tooltip content={<CustomTooltip />} />
+      <Bar dataKey="duration" fill="hsl(var(--chart-1))" />
+    </BarChart>
+  );
+}
+```
+
+**Lucide React** (for icons)
+- Lightweight, consistent icon set
+- React component format
+- Customizable via props
+
+---
+
+### 6. Data Visualization: Gantt Chart
+
+**Requirement**: Display task execution timeline per grouping
+
+**Design**:
+```
+Time (X-axis) →
+│
+├─ Task 1  │████ (estimated 15min)
+├─ Task 2  │    ███  (depends on Task 1)
+├─ Task 3  │       ████
+│
+Grouping: PAYROLL
+Valid: 3, Invalid: 0
+Critical Path: 08:00 → 08:45 (45 minutes)
+```
+
+**Implementation Approach**:
+1. **Recharts BarChart**: Simple, performant for 100–500 tasks
+2. **Custom SVG Canvas**: If > 500 tasks (performance optimization)
+3. **Virtual List** (react-window): Only render visible tasks
+
+**Color Scheme**:
+| Status | Color | Meaning |
+|--------|-------|---------|
+| Valid + Actual Duration | Solid Green (hsl(142, 71%, 45%)) | Feasible, real data |
+| Valid + Estimated Duration | Light Green (hsl(142, 71%, 80%)) | Feasible, estimated |
+| Invalid | Red (hsl(0, 84%, 60%)) | Deadline violation |
+| Critical Path | Yellow (hsl(38, 92%, 50%)) | On critical path |
+
+**Interactions**:
+- **Hover**: Show task details (ID, name, start, end, prerequisites)
+- **Click**: Drill-down to task details (for debugging)
+- **Deadline Line**: If task has intake deadline, draw vertical line at deadline time
+
+---
+
+## Web GUI Component Architecture
+
+### Page 1: Dashboard
+
+**Layout**:
+```
+┌─────────────────────────────────────────────────────┐
+│ Dashboard                                           │
+├─────────────────────────────────────────────────────┤
+│ [← Back] [Refresh] [Export]                        │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ Execution Overview                                  │
+│ ┌──────────────┬──────────────┬──────────────┐    │
+│ │ Total Tasks  │ Valid        │ Invalid      │    │
+│ │ 150          │ 145 (96%)    │ 5 (4%)       │    │
+│ └──────────────┴──────────────┴──────────────┘    │
+│                                                     │
+│ Convergence Progress                                │
+│ ├─ Round 1: 127 tasks changed position (+15 delta) │
+│ ├─ Round 2: 18 tasks changed position (+3 delta)   │
+│ ├─ Round 3: 0 tasks changed (CONVERGED)            │
+│ └─ Total Time: 1.24 seconds                        │
+│                                                     │
+│ Critical Path: 06:00 → 17:30 (11.5 hours)         │
+│                                                     │
+│ Deadline Misses: 5                                  │
+│ ├─ Task 42: Completes 14:15, deadline 14:00      │
+│ ├─ Task 87: Completes 11:45, deadline 11:30      │
+│ └─ [Show All]                                      │
+│                                                     │
+│ Business Groupings (click to drill-down)           │
+│ ├─ PAYROLL (95 tasks) → 06:00–14:00, 0 misses    │
+│ ├─ SETTLEMENT (40 tasks) → 09:00–15:30, 2 misses │
+│ └─ REPORTING (15 tasks) → 17:00–18:00, 3 misses  │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+### Page 2: Groups (Sequence Visualization)
+
+**Layout**:
+```
+┌─────────────────────────────────────────────────────┐
+│ Group: PAYROLL                                      │
+├─────────────────────────────────────────────────────┤
+│ [← Back] [Download Timeline] [Export to ICS]       │
+├─────────────────────────────────────────────────────┤
+│ Stats: 95 tasks, 93 valid, 2 invalid              │
+│ Critical Path: 06:00 → 14:00 (8 hours)            │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ TIMELINE GANTT CHART (horizontal scrollable)       │
+│ ├─ 06:00  07:00  08:00  09:00  10:00  11:00 ...   │
+│ │                                                  │
+│ ├─ Task 1  [████─── Extract ]                     │
+│ ├─ Task 2  |      [─── Validate ]                 │
+│ ├─ Task 3  |           [██ Transform]             │
+│ ├─ Task 4  [XXXX─ Invalid:deadline]               │
+│ ├─ Task 5  |           |   [─ Load]               │
+│ ├─ Task 6  |           |      [─ Publish]         │
+│ │...                                              │
+│ └─ Task 95|..................    [Cleanup]         │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│ Task Details (click task to expand)                │
+│ Task 4: INVALID                                    │
+│  Precursors: Task 1, Task 2                        │
+│  Scheduled Start: 10:30                            │
+│  Calculated Start: 10:45 (due to Task 2 delay)    │
+│  Duration: 120 min (est.)                          │
+│  Planned End: 12:45                                │
+│  ⚠️ Deadline: 12:00 → MISSES by 45 minutes         │
+│  Reason: Task 2 completed too late                │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+### Page 3: Timeline (All Groups)
+
+**Layout**: Same Gantt chart but all groupings overlaid with different colors/patterns
+
+### Page 4: Violations & Deadlines
+
+**Layout**:
+```
+┌─────────────────────────────────────────────────────┐
+│ Deadline Violations (5 total)                       │
+├─────────────────────────────────────────────────────┤
+│ [Filter by Group] [Sort by Miss Magnitude]          │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ Task │ Grouping   │ Planned End │ Deadline │ Miss  │
+│──────┼────────────┼─────────────┼──────────┼───────│
+│ 42   │ REPORTING  │ 18:00       │ 17:30    │ +30m  │
+│ 87   │ SETTLEMENT │ 11:45       │ 11:30    │ +15m  │
+│ 55   │ PAYROLL    │ 14:05       │ 14:00    │ +5m   │
+│ 71   │ SETTLEMENT │ 16:00       │ 15:45    │ +15m  │
+│ 99   │ REPORTING  │ 21:00       │ 20:30    │ +30m  │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Data Flow: API → Frontend
+
+### Reporting DTOs (sent by ASP.NET Core API)
+
+```csharp
+// Response from GET /api/reports/{reportId}
+public record ExecutionPlanDto(
+    string IncrementId,
+    DateTime IncrementStart,
+    DateTime IncrementEnd,
+    ExecutionInstanceDto[] Tasks,
+    string[] TaskChain,
+    int TotalValidTasks,
+    int TotalInvalidTasks,
+    DateTime? CriticalPathCompletion,
+    string[] DeadlineMisses
+);
+
+public record ExecutionInstanceDto(
+    string ExecutionInstanceKey,  // Grain key
+    string InterfaceNumber,
+    string InterfaceName,
+    DateTime ScheduledStartTime,
+    DateTime CalculatedStartTime,
+    DateTime PlannedCompletionTime,
+    DateTime? IntakeDeadline,
+    int DurationMinutes,
+    bool IsEstimatedDuration,
+    bool IsValid,
+    string? ValidationMessage
+);
+
+// Response from GET /api/groups/{groupId}
+public record SequenceGroupReportDto(
+    string GroupId,
+    string GroupName,
+    ExecutionPlanDto GroupPlan,
+    SequenceGroupMetricsDto Metrics
+);
+
+public record SequenceGroupMetricsDto(
+    int ValidTaskCount,
+    int InvalidTaskCount,
+    DateTime CriticalPathCompletion,
+    TimeSpan TotalDuration,
+    Dictionary<int, int> TasksChangedPerRound  // Round → count
+);
+```
+
+### TypeScript Interfaces (Frontend)
+
+```typescript
+// src/types/execution-plan.ts
+export interface ExecutionPlan {
+  incrementId: string;
+  incrementStart: string;  // ISO8601
+  incrementEnd: string;
+  tasks: ExecutionInstance[];
+  taskChain: string[];
+  totalValidTasks: number;
+  totalInvalidTasks: number;
+  criticalPathCompletion?: string;
+  deadlineMisses: string[];
+}
+
+export interface ExecutionInstance {
+  executionInstanceKey: string;
+  interfaceNumber: string;
+  interfaceName: string;
+  scheduledStartTime: string;
+  calculatedStartTime: string;
+  plannedCompletionTime: string;
+  intakeDeadline?: string;
+  durationMinutes: number;
+  isEstimatedDuration: boolean;
+  isValid: boolean;
+  validationMessage?: string;
+}
+
+export interface SequenceGroupReport {
+  groupId: string;
+  groupName: string;
+  groupPlan: ExecutionPlan;
+  metrics: SequenceGroupMetrics;
+}
+
+export interface SequenceGroupMetrics {
+  validTaskCount: number;
+  invalidTaskCount: number;
+  criticalPathCompletion: string;
+  totalDuration: string;  // Duration format
+  tasksChangedPerRound: Record<number, number>;
+}
+```
+
+---
+
+## Deployment Scenarios
+
+### Scenario 1: Local Development (Aspire)
+
+```bash
+cd src/
+dotnet run --project AppHost/AppHost.csproj
+# Services start automatically
+# Open http://localhost:5173 (React)
+# Orleans dashboard: http://localhost:8080
+```
+
+### Scenario 2: Docker Compose (local containers)
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  orleans-silo:
+    build:
+      context: .
+      dockerfile: Orleans.Dockerfile
+    ports:
+      - "11111:11111"
+  
+  webapi:
+    build:
+      context: .
+      dockerfile: WebApi.Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - orleans-silo
+  
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+
+# docker compose up
+```
+
+### Scenario 3: Azure Container Apps (production)
+
+```yaml
+# azure container app configuration
+containerResources:
+  cpu: '0.5'
+  memory: '1Gi'
+ingress:
+  external: true
+  targetPort: 5001
+env:
+  - name: ORLEANS_ENDPOINT
+    value: https://orleans-silo.internal.containerapp.io:11111
+```
+
+---
+
+## Performance & Scalability Requirements
+
+### Frontend Performance Targets
+
+| Metric | Target | Notes |
+|--------|--------|-------|
+| Dashboard initial load | < 2 seconds | 150–200 tasks |
+| Gantt chart render | < 1 second | 100 tasks visible |
+| Gantt chart scroll smoothness | 60 FPS | Virtual scrolling if > 500 tasks |
+| Group drill-down | < 500ms | Cached data from API |
+| Violations list load | < 300ms | Sorted & paginated |
+| Page transition | < 100ms | React Router preloading |
+
+### Backend Performance Targets
+
+| Operation | Target | Conditions |
+|-----------|--------|-----------|
+| ExecuteRound (single) | < 500ms | 150 tasks, all grains in parallel |
+| Convergence detection | < 2s | 3 rounds, 150 tasks |
+| Generate final plan | < 100ms | Aggregation only, grains already computed |
+| API response (report) | < 100ms | Data already in ReportGeneratorGrain state |
+
+### Scalability Limits (Phase 2)
+
+- **Tasks**: Up to 1000 per execution plan
+- **Groupings**: Up to 20 business domains
+- **Concurrent users**: 1 (local/internal tool)
+- **Grains in silo**: 1000–2000 (laptop development)
+
+---
+
+## Security & Access Control
+
+### Phase 2 (Development)
+
+- **No authentication** required
+- **No external network exposure**
+- **localhost-only** for local development
+- **Aspire provides no built-in security**
+
+### Phase 3+ (Production)
+
+- Azure AD / OAuth2 authentication
+- Role-based access control (Viewer, Planner, Admin)
+- API rate limiting
+- CORS restricted to known origins
+- HTTPS/TLS for all endpoints
+- Encrypted state storage
+
+---
+
+## Testing Strategy
+
+### Frontend Tests
+
+```typescript
+// src/__tests__/Dashboard.test.tsx
+import { render, screen } from '@testing-library/react';
+import Dashboard from '../pages/Dashboard';
+
+test('displays execution statistics', async () => {
+  render(<Dashboard />);
+  expect(screen.getByText(/Total Tasks/)).toBeInTheDocument();
+  expect(screen.getByText(/145/)).toBeInTheDocument();  // 145 valid
+});
+```
+
+### Backend Tests
+
+```csharp
+[Fact]
+public async Task GetReport_ReturnsExecutionPlanDto()
+{
+    // Arrange
+    var reportId = "ExecutionPlan_2024-03-25";
+    var mockGrain = Substitute.For<IReportGeneratorGrain>();
+    mockGrain.GetFullReportAsync().Returns(/* mock plan */);
+    
+    // Act
+    var result = await controller.GetReport(reportId);
+    
+    // Assert
+    result.Should().NotBeNull();
+    result.Value.TotalValidTasks.Should().Be(145);
+}
+```
+
+### Integration Tests
+
+- End-to-end scenarios from CSV load → web dashboard display
+- Orleans test host for grain execution
+- API integration via `WebApplicationFactory`
+
+---
+
+## Accessibility & UX
+
+### Accessibility (Phase 3+)
+
+- WCAG 2.1 Level AA compliance
+- Keyboard navigation (Tab, Enter, Escape)
+- Screen reader support (semantic HTML, ARIA labels)
+- Color-blind safe color scheme
+
+### UX Principles
+
+- **Progressive disclosure**: Show summary first, drill-down for details
+- **Real-time feedback**: Show convergence progress during calculation
+- **Clear error messages**: "Task 42 deadline is 14:00 but completion is 14:05 (+5m)"
+- **Export options**: Timeline as PNG, ICS calendar, CSV
+
+---
+
+## Success Metrics
+
+- **Dashboard loads < 2s for 150-task plans** ✓
+- **End-to-end (CSV load → web display) < 3 seconds for 100-task plans** ✓
+- **Convergence clearly visible with round-by-round progress** ✓
+- **Violations highlighted in red on timeline** ✓
+- **Groups organize tasks logically by business domain** ✓
+- **Developers can start local environment via `dotnet run` (1 command)** ✓
+
+---
+
+## Technology Stack Summary Table
+
+| Layer | Technology | Version | Purpose |
+|-------|-----------|---------|---------|
+| **Backend: Distributed Computation** | Orleans | 8.x | Grain-based parallel execution |
+| **Backend: Web API** | ASP.NET Core | 8 | REST endpoints for frontend |
+| **Backend: Orchestration** | Aspire | 8.x | Service orchestration & local dev |
+| **Backend: Logging** | Serilog | 3.x | Structured logging |
+| **Frontend: Framework** | React | 18.x | UI components & state management |
+| **Frontend: Build Tool** | Vite | 5.x | Fast bundler & dev server |
+| **Frontend: Styling** | Tailwind CSS | 3.x | Utility-first CSS |
+| **Frontend: Charts** | Recharts | 2.x | Gantt timeline rendering |
+| **Frontend: Icons** | Lucide React | latest | Icon components |
+| **Frontend: HTTP** | axios | 1.x | API client |
+
+---
+
+**Ready for Phase 2 Implementation: AWAITING APPROVAL**

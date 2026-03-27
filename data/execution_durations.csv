@@ -1,0 +1,5 @@
+TaskId,ExecutionDate,ExecutionTime,ActualDurationMinutes,Status
+1,2024-03-25,06:00:00,125,Completed
+1,2024-03-25,14:00:00,118,Completed
+2,2024-03-25,08:00:00,58,Completed
+3,2024-03-25,09:00:00,92,Completed

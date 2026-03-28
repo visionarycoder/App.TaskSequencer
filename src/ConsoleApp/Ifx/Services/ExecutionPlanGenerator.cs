@@ -9,11 +9,11 @@ namespace ConsoleApp.Ifx.Services;
 /// </summary>
 public class ExecutionPlanGenerator
 {
-    private readonly ManifestCsvParser _csvParser;
-    private readonly ManifestTransformer _transformer;
-    private readonly ExecutionEventMatrixBuilder _matrixBuilder;
-    private readonly DependencyResolver _dependencyResolver;
-    private readonly DeadlineValidator _deadlineValidator;
+    private readonly ManifestCsvParser csvParser;
+    private readonly ManifestTransformer transformer;
+    private readonly ExecutionEventMatrixBuilder matrixBuilder;
+    private readonly DependencyResolver dependencyResolver;
+    private readonly DeadlineValidator deadlineValidator;
 
     public ExecutionPlanGenerator(
         ManifestCsvParser? csvParser = null,
@@ -22,11 +22,11 @@ public class ExecutionPlanGenerator
         DependencyResolver? dependencyResolver = null,
         DeadlineValidator? deadlineValidator = null)
     {
-        _csvParser = csvParser ?? new ManifestCsvParser();
-        _transformer = transformer ?? new ManifestTransformer();
-        _matrixBuilder = matrixBuilder ?? new ExecutionEventMatrixBuilder();
-        _dependencyResolver = dependencyResolver ?? new DependencyResolver();
-        _deadlineValidator = deadlineValidator ?? new DeadlineValidator();
+        this.csvParser = csvParser ?? new ManifestCsvParser();
+        this.transformer = transformer ?? new ManifestTransformer();
+        this.matrixBuilder = matrixBuilder ?? new ExecutionEventMatrixBuilder();
+        this.dependencyResolver = dependencyResolver ?? new DependencyResolver();
+        this.deadlineValidator = deadlineValidator ?? new DeadlineValidator();
     }
 
     /// <summary>
@@ -43,29 +43,29 @@ public class ExecutionPlanGenerator
 
         // Phase 0: Load and parse all CSV files
         var (taskManifests, intakeEventManifests, durationManifests) =
-            _csvParser.ParseAll(taskDefinitionPath, intakeEventPath, durationHistoryPath);
+            this.csvParser.ParseAll(taskDefinitionPath, intakeEventPath, durationHistoryPath);
 
         // Phase 0.5: Transform intake events to requirements lookup
-        var intakeRequirementsLookup = TransformIntakeEvents(intakeEventManifests);
+        var intakeRequirementsLookup = this.TransformIntakeEvents(intakeEventManifests);
 
         // Phase 1: Build duration lookup from history (or use defaults)
-        var durationLookup = BuildDurationLookup(durationManifests, taskManifests);
+        var durationLookup = this.BuildDurationLookup(durationManifests, taskManifests);
 
         // Phase 2: Transform task manifests to enhanced definitions
         var taskDefinitions = taskManifests.Select(m =>
-            _transformer.TransformTaskDefinition(m, intakeRequirementsLookup)).ToList();
+            this.transformer.TransformTaskDefinition(m, intakeRequirementsLookup)).ToList();
 
         // Phase 3: Build execution event matrix
-        var executionEvents = _matrixBuilder.BuildCompleteExecutionEventMatrix(taskDefinitions);
+        var executionEvents = this.matrixBuilder.BuildCompleteExecutionEventMatrix(taskDefinitions);
 
         // Phase 4: Resolve dependencies and validate
-        var executionInstances = ResolveAndValidate(
+        var executionInstances = this.ResolveAndValidate(
             executionEvents,
             durationLookup,
             periodStartDate.Value);
 
         // Phase 5: Generate execution plan
-        var executionPlan = BuildExecutionPlan(
+        var executionPlan = this.BuildExecutionPlan(
             executionInstances,
             periodStartDate.Value);
 
@@ -82,7 +82,7 @@ public class ExecutionPlanGenerator
 
         foreach (var manifest in intakeEventManifests)
         {
-            var requirement = _transformer.TransformIntakeEvent(manifest);
+            var requirement = this.transformer.TransformIntakeEvent(manifest);
             lookup[manifest.TaskId] = requirement;
         }
 
@@ -109,7 +109,7 @@ public class ExecutionPlanGenerator
             if (executionTime == null)
                 continue;
 
-            var duration = _transformer.TransformExecutionDuration(manifest);
+            var duration = this.transformer.TransformExecutionDuration(manifest);
             lookup[(manifest.TaskId, executionDate, executionTime)] = duration;
         }
 
@@ -137,21 +137,21 @@ public class ExecutionPlanGenerator
             var eventKey = executionEvent.GetExecutionEventKey();
 
             // Resolve prerequisites
-            var resolvedPrerequisites = _dependencyResolver.ResolvePrerequisites(
+            var resolvedPrerequisites = this.dependencyResolver.ResolvePrerequisites(
                 executionEvent,
                 executionEvents);
 
             // Get duration (actual from history or default 15 min)
-            var duration = GetDuration(executionEvent, durationLookup);
+            var duration = this.GetDuration(executionEvent, durationLookup);
 
             // Calculate scheduled start time
-            var scheduledStart = ApplyTimeToDateForWeek(
+            var scheduledStart = this.ApplyTimeToDateForWeek(
                 executionEvent.ScheduledDay,
                 executionEvent.ScheduledTime,
                 periodStartDate);
 
             // Calculate adjusted start (accounting for prerequisites)
-            var adjustedStart = _dependencyResolver.CalculateAdjustedStartTime(
+            var adjustedStart = this.dependencyResolver.CalculateAdjustedStartTime(
                 executionEvent,
                 resolvedPrerequisites,
                 eventTimingLookup,
@@ -164,17 +164,17 @@ public class ExecutionPlanGenerator
             eventTimingLookup[eventKey] = (scheduledStart, plannedCompletion, duration);
 
             // Validate deadline compliance
-            var (isValidDeadline, deadlineMessage) = _deadlineValidator.ValidateDeadline(
+            var (isValidDeadline, deadlineMessage) = this.deadlineValidator.ValidateDeadline(
                 executionEvent,
                 adjustedStart,
                 duration,
                 periodStartDate);
 
             // Check for cascading failures from invalid prerequisites
-            var invalidDueToPrereq = _dependencyResolver.ResolvePrerequisites(
+            var invalidDueToPrereq = this.dependencyResolver.ResolvePrerequisites(
                 executionEvent,
                 executionEvents).Count > 0 &&
-                _dependencyResolver.ResolvePrerequisites(
+                this.dependencyResolver.ResolvePrerequisites(
                     executionEvent,
                     executionEvents).Any(p =>
                     {

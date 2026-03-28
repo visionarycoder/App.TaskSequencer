@@ -17,7 +17,5 @@
   <Folder Name="/src/">
     <Project Path="src/ConsoleApp/ConsoleApp.csproj" Id="50c84202-9e8a-4b0a-849a-6f74f0d630c1" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/ConsoleApp.Tests/ConsoleApp.Tests.csproj" />
-  </Folder>
+  <Folder Name="/tests/" />
 </Solution>

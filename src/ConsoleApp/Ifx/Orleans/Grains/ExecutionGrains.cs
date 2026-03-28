@@ -8,49 +8,51 @@ namespace ConsoleApp.Ifx.Orleans.Grains;
 /// </summary>
 public class ExecutionTaskGrain : Grain, IExecutionTaskGrain
 {
-    private ExecutionEventDefinition? _eventDef;
-    private ExecutionDuration? _duration;
-    private DateTime _currentStartTime;
-    private DateTime _plannedCompletion;
-    private bool _isValid = false;
-    private string? _validationMessage;
+    private ExecutionEventDefinition? eventDef;
+    private ExecutionDuration? duration;
+    private DateTime currentStartTime;
+    private DateTime plannedCompletion;
+    private bool isValid = false;
+    private string? validationMessage;
+    private IReadOnlySet<string> prerequisites = new HashSet<string>().AsReadOnly();
 
-    public Task InitializeAsync(ExecutionEventDefinition eventDef, ExecutionDuration duration)
+    public Task InitializeAsync(ExecutionEventDefinition eventDef, ExecutionDuration duration, CancellationToken ct)
     {
-        _eventDef = eventDef;
-        _duration = duration;
-        _currentStartTime = GetDefaultStartTime();
-        _plannedCompletion = _currentStartTime.Add(_duration.ToTimeSpan());
+        this.eventDef = eventDef ?? throw new ArgumentNullException(nameof(eventDef));
+        this.duration = duration ?? throw new ArgumentNullException(nameof(duration));
+        this.currentStartTime = GetDefaultStartTime();
+        this.plannedCompletion = this.currentStartTime.Add(this.duration.ToTimeSpan());
+        this.prerequisites = eventDef.PrerequisiteTaskIds;
         return Task.CompletedTask;
     }
 
-    public Task<ExecutionInstanceEnhanced> GetExecutionInstanceAsync()
+    public Task<ExecutionInstanceEnhanced> GetExecutionInstanceAsync(CancellationToken ct)
     {
-        if (_eventDef is null || _duration is null)
+        if (this.eventDef is null || this.duration is null)
             throw new InvalidOperationException("Grain not initialized");
 
         var instance = new ExecutionInstanceEnhanced(
             Id: GetHashCode(),
             TaskId: -1,
-            TaskIdString: _eventDef.TaskId,
-            TaskName: _eventDef.TaskName,
+            TaskIdString: this.eventDef.TaskId,
+            TaskName: this.eventDef.TaskName,
             ScheduledStartTime: GetDefaultStartTime(),
-            FunctionalStartTime: _currentStartTime != GetDefaultStartTime() ? _currentStartTime : null,
-            RequiredEndTime: _eventDef.IntakeRequirement?.GetIntakeDeadline(GetDefaultStartTime()),
-            Duration: _duration,
-            PlannedCompletionTime: _plannedCompletion,
-            PrerequisiteTaskIds: _eventDef.PrerequisiteTaskIds,
-            IsValid: _isValid,
-            Status: _isValid ? ExecutionStatus.ReadyToExecute : ExecutionStatus.Invalid,
-            ValidationMessage: _validationMessage
+            FunctionalStartTime: this.currentStartTime != GetDefaultStartTime() ? this.currentStartTime : null,
+            RequiredEndTime: this.eventDef.IntakeRequirement?.GetIntakeDeadline(GetDefaultStartTime()),
+            Duration: this.duration,
+            PlannedCompletionTime: this.plannedCompletion,
+            PrerequisiteTaskIds: this.prerequisites,
+            IsValid: this.isValid,
+            Status: this.isValid ? ExecutionStatus.ReadyToExecute : ExecutionStatus.Invalid,
+            ValidationMessage: this.validationMessage
         );
 
         return Task.FromResult(instance);
     }
 
-    public Task<DateTime> UpdateStartTimeAsync(Dictionary<string, DateTime> prerequisiteCompletions)
+    public Task<DateTime> UpdateStartTimeAsync(IReadOnlyDictionary<string, DateTime> prerequisiteCompletions, CancellationToken ct)
     {
-        if (_eventDef is null || _duration is null)
+        if (this.eventDef is null || this.duration is null)
             throw new InvalidOperationException("Grain not initialized");
 
         var defaultStart = GetDefaultStartTime();
@@ -58,7 +60,7 @@ public class ExecutionTaskGrain : Grain, IExecutionTaskGrain
         // Find latest prerequisite completion time
         var latestPrereqCompletion = DateTime.MinValue;
 
-        foreach (var prereqTaskId in _eventDef.PrerequisiteTaskIds)
+        foreach (var prereqTaskId in this.prerequisites)
         {
             // Look for any prerequisite that has been calculated
             var matchingKey = prerequisiteCompletions.Keys
@@ -76,74 +78,95 @@ public class ExecutionTaskGrain : Grain, IExecutionTaskGrain
             ? latestPrereqCompletion
             : defaultStart;
 
-        var oldStartTime = _currentStartTime;
-        _currentStartTime = newStartTime;
-        _plannedCompletion = _currentStartTime.Add(_duration.ToTimeSpan());
+        var oldStartTime = this.currentStartTime;
+        this.currentStartTime = newStartTime;
+        this.plannedCompletion = this.currentStartTime.Add(this.duration.ToTimeSpan());
 
-        // Return whether this grain's start time changed
+        // Return the new start time
         return Task.FromResult(newStartTime);
     }
 
-    public Task<DateTime> GetPlannedCompletionAsync()
+    public Task<DateTime> GetPlannedCompletionAsync(CancellationToken ct)
     {
-        return Task.FromResult(_plannedCompletion);
+        return Task.FromResult(this.plannedCompletion);
     }
 
-    public Task<(bool IsValid, string? Message)> ValidateDeadlineAsync()
+    public Task<(bool IsValid, ExecutionStatus Status, string? Message)> ValidateDeadlineAsync(CancellationToken ct)
     {
-        if (_eventDef is null || _duration is null)
-            return Task.FromResult((false, "Grain not initialized"));
+        if (this.eventDef is null || this.duration is null)
+            return Task.FromResult<(bool, ExecutionStatus, string?)>((false, ExecutionStatus.Invalid, "Grain not initialized"));
 
         // Check deadline
-        if (_eventDef.IntakeRequirement is null)
-            return Task.FromResult((true, null));
+        if (this.eventDef.IntakeRequirement is null)
+            return Task.FromResult<(bool, ExecutionStatus, string?)>((true, ExecutionStatus.ReadyToExecute, null));
 
-        var deadline = _eventDef.IntakeRequirement.GetIntakeDeadline(GetDefaultStartTime());
+        var deadline = this.eventDef.IntakeRequirement.GetIntakeDeadline(GetDefaultStartTime());
 
-        if (_plannedCompletion <= deadline)
+        if (this.plannedCompletion <= deadline)
         {
-            _isValid = true;
-            _validationMessage = null;
-            return Task.FromResult((true, null));
+            this.isValid = true;
+            this.validationMessage = null;
+            return Task.FromResult<(bool, ExecutionStatus, string?)>((true, ExecutionStatus.ReadyToExecute, null));
         }
 
-        _isValid = false;
-        _validationMessage = $"Deadline miss: completion {_plannedCompletion:g}, deadline {deadline:g}";
-        return Task.FromResult((false, _validationMessage));
+        this.isValid = false;
+        this.validationMessage = $"Deadline miss: completion {this.plannedCompletion:g}, deadline {deadline:g}";
+        return Task.FromResult<(bool, ExecutionStatus, string?)>((false, ExecutionStatus.DeadlineMiss, this.validationMessage));
     }
 
-    public Task MarkAsReadyAsync()
+    public Task MarkAsReadyAsync(CancellationToken ct)
     {
-        _isValid = true;
+        this.isValid = true;
         return Task.CompletedTask;
     }
 
-    public Task<IReadOnlySet<string>> GetPrerequisitesAsync()
+    public Task<IReadOnlySet<string>> GetPrerequisitesAsync(CancellationToken ct)
     {
-        if (_eventDef is null)
-            return Task.FromResult((IReadOnlySet<string>)new HashSet<string>().AsReadOnly());
-
-        return Task.FromResult(_eventDef.PrerequisiteTaskIds);
+        return Task.FromResult(this.prerequisites);
     }
 
-    public Task<string> GetExecutionEventKeyAsync()
+    public Task<string> GetExecutionEventKeyAsync(CancellationToken ct)
     {
-        if (_eventDef is null)
+        if (this.eventDef is null)
             throw new InvalidOperationException("Grain not initialized");
 
-        return Task.FromResult(_eventDef.GetExecutionEventKey());
+        return Task.FromResult(this.eventDef.GetExecutionEventKey());
+    }
+
+    public Task<TimeSpan?> GetDeadlineSlackAsync(CancellationToken ct)
+    {
+        if (this.eventDef?.IntakeRequirement is null)
+            return Task.FromResult<TimeSpan?>(null);
+
+        var deadline = this.eventDef.IntakeRequirement.GetIntakeDeadline(GetDefaultStartTime());
+        var slack = deadline - this.plannedCompletion;
+        return Task.FromResult<TimeSpan?>(slack);
+    }
+
+    public Task SetPrerequisitesAsync(IReadOnlySet<string> prerequisiteTaskIds, CancellationToken ct)
+    {
+        this.prerequisites = prerequisiteTaskIds ?? throw new ArgumentNullException(nameof(prerequisiteTaskIds));
+        return Task.CompletedTask;
+    }
+
+    public Task<ExecutionDuration> GetDurationAsync(CancellationToken ct)
+    {
+        if (this.duration is null)
+            throw new InvalidOperationException("Grain not initialized");
+
+        return Task.FromResult(this.duration);
     }
 
     private DateTime GetDefaultStartTime()
     {
-        if (_eventDef is null)
+        if (this.eventDef is null)
             return DateTime.Now;
 
         // Calculate start time based on day and time in current week
         var today = DateTime.Now.Date;
-        var daysToAdd = ((int)_eventDef.ScheduledDay - (int)today.DayOfWeek + 7) % 7;
+        var daysToAdd = ((int)this.eventDef.ScheduledDay - (int)today.DayOfWeek + 7) % 7;
         var targetDate = today.AddDays(daysToAdd);
-        return _eventDef.ScheduledTime.ApplyToDate(targetDate);
+        return this.eventDef.ScheduledTime.ApplyToDate(targetDate);
     }
 }
 
@@ -152,25 +175,35 @@ public class ExecutionTaskGrain : Grain, IExecutionTaskGrain
 /// </summary>
 public class ExecutionPlanCoordinatorGrain : Grain, IExecutionPlanCoordinatorGrain
 {
-    private Dictionary<string, IExecutionTaskGrain> _taskGrains = new();
-    private DateTime _periodStartDate;
-    private IReadOnlyList<ExecutionInstanceEnhanced>? _currentPlan;
-    private int _iterationCount;
-    private const int MAX_ITERATIONS = 100; // Prevent infinite loops
+    private Dictionary<string, IExecutionTaskGrain> taskGrains = new();
+    private DateTime periodStartDate;
+    private IReadOnlyList<ExecutionInstanceEnhanced>? currentPlan;
+    private int iterationCount;
+    private DateTime refinementStartTime;
+    private List<string> conflictingTasks = new();
+    private const int MaxIterations = 100; // Prevent infinite loops
 
     public async Task<ExecutionPlan> CalculateExecutionPlanAsync(
         IReadOnlyList<ExecutionEventDefinition> executionEvents,
         IReadOnlyList<ExecutionInstanceEnhanced> initialInstances,
-        DateTime periodStartDate)
+        DateTime periodStartDate,
+        CancellationToken ct)
     {
-        _periodStartDate = periodStartDate;
-        _iterationCount = 0;
+        ArgumentNullException.ThrowIfNull(executionEvents);
+        ArgumentNullException.ThrowIfNull(initialInstances);
+
+        this.periodStartDate = periodStartDate;
+        this.iterationCount = 0;
+        this.refinementStartTime = DateTime.UtcNow;
+        this.conflictingTasks.Clear();
 
         // Create grain for each execution event
         var grainFactory = this.GrainFactory;
 
         foreach (var eventDef in executionEvents)
         {
+            ct.ThrowIfCancellationRequested();
+
             var grainKey = eventDef.GetExecutionEventKey();
             var grain = grainFactory.GetGrain<IExecutionTaskGrain>(grainKey);
 
@@ -178,77 +211,119 @@ public class ExecutionPlanCoordinatorGrain : Grain, IExecutionPlanCoordinatorGra
             var instance = initialInstances.FirstOrDefault(i => i.TaskIdString == eventDef.TaskId);
             var duration = instance?.Duration ?? ExecutionDuration.Default();
 
-            await grain.InitializeAsync(eventDef, duration);
-            _taskGrains[grainKey] = grain;
+            await grain.InitializeAsync(eventDef, duration, ct);
+            taskGrains[grainKey] = grain;
         }
 
         // Iteratively refine time slots
         bool converged = false;
-        while (_iterationCount < MAX_ITERATIONS && !converged)
+        while (iterationCount < MaxIterations && !converged)
         {
-            (converged, _) = await RefineTimeSlotIterationAsync();
-            _iterationCount++;
+            ct.ThrowIfCancellationRequested();
+            (converged, _) = await RefineTimeSlotIterationAsync(ct);
+            iterationCount++;
         }
 
         // Build final execution plan
-        return await BuildExecutionPlanAsync();
+        return await BuildExecutionPlanAsync(ct);
     }
 
-    public async Task<(bool HasConverged, int UpdateCount)> RefineTimeSlotIterationAsync()
+    public async Task<(bool HasConverged, int UpdateCount)> RefineTimeSlotIterationAsync(CancellationToken ct)
     {
-        if (_taskGrains.Count == 0)
+        if (taskGrains.Count == 0)
             return (true, 0);
 
         int updateCount = 0;
         var completionTimes = new Dictionary<string, DateTime>();
 
         // Get all current planned completions
-        foreach (var (key, grain) in _taskGrains)
+        foreach (var (key, grain) in taskGrains)
         {
-            var completion = await grain.GetPlannedCompletionAsync();
+            ct.ThrowIfCancellationRequested();
+            var completion = await grain.GetPlannedCompletionAsync(ct);
             completionTimes[key] = completion;
         }
 
-        // Update all grains with prerequisite information
+        // Update all grains with prerequisite information (in parallel where possible)
         var tasks = new List<Task<DateTime>>();
-        foreach (var grain in _taskGrains.Values)
+        foreach (var grain in taskGrains.Values)
         {
-            tasks.Add(grain.UpdateStartTimeAsync(completionTimes));
+            tasks.Add(grain.UpdateStartTimeAsync(completionTimes, ct));
         }
 
         var results = await Task.WhenAll(tasks);
         updateCount = results.Length;
 
-        // Check convergence: if no grain start times changed significantly
+        // Check convergence: validate all grains against deadlines
         bool allConverged = true;
-        foreach (var grain in _taskGrains.Values)
+        conflictingTasks.Clear();
+
+        foreach (var grain in taskGrains.Values)
         {
-            var result = await grain.ValidateDeadlineAsync();
-            if (!result.IsValid)
+            ct.ThrowIfCancellationRequested();
+            var (isValid, status, message) = await grain.ValidateDeadlineAsync(ct);
+            if (!isValid)
             {
                 allConverged = false;
-                break;
+                var eventKey = await grain.GetExecutionEventKeyAsync(ct);
+                conflictingTasks.Add(eventKey);
             }
         }
 
-        return (allConverged || _iterationCount >= MAX_ITERATIONS - 1, updateCount);
+        return (allConverged || iterationCount >= MaxIterations - 1, updateCount);
     }
 
-    public async Task<ExecutionPlan> GetCurrentPlanAsync()
+    public async Task<ExecutionPlan> GetCurrentPlanAsync(CancellationToken ct)
     {
-        return await BuildExecutionPlanAsync();
+        return await BuildExecutionPlanAsync(ct);
     }
 
-    private async Task<ExecutionPlan> BuildExecutionPlanAsync()
+    public async Task<ConvergenceInfo> GetConvergenceInfoAsync(CancellationToken ct)
+    {
+        var validCount = 0;
+        var invalidCount = 0;
+
+        foreach (var grain in taskGrains.Values)
+        {
+            ct.ThrowIfCancellationRequested();
+            var instance = await grain.GetExecutionInstanceAsync(ct);
+            if (instance.IsValid)
+                validCount++;
+            else
+                invalidCount++;
+        }
+
+        var plan = await BuildExecutionPlanAsync(ct);
+
+        return new ConvergenceInfo
+        {
+            HasConverged = iterationCount < MaxIterations || invalidCount == 0,
+            IterationCount = iterationCount,
+            Reason = iterationCount >= MaxIterations ? ConvergenceReason.MaxIterations : ConvergenceReason.Organic,
+            ValidTaskCount = validCount,
+            InvalidTaskCount = invalidCount,
+            CriticalPathCompletion = plan.CriticalPathCompletion,
+            ElapsedTime = DateTime.UtcNow - refinementStartTime
+        };
+    }
+
+    public async Task<IReadOnlyList<string>> GetConflictingTasksAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return conflictingTasks.AsReadOnly();
+    }
+
+    private async Task<ExecutionPlan> BuildExecutionPlanAsync(CancellationToken ct)
     {
         var tasks = new List<ExecutionInstanceEnhanced>();
         var validCount = 0;
         var invalidCount = 0;
         var deadlineMisses = new List<string>();
 
-        foreach (var grain in _taskGrains.Values)
+        foreach (var grain in taskGrains.Values)
         {
-            var instance = await grain.GetExecutionInstanceAsync();
+            ct.ThrowIfCancellationRequested();
+            var instance = await grain.GetExecutionInstanceAsync(ct);
             tasks.Add(instance);
 
             if (instance.IsValid)
@@ -264,12 +339,12 @@ public class ExecutionPlanCoordinatorGrain : Grain, IExecutionPlanCoordinatorGra
             ? tasks.Max(t => t.PlannedCompletionTime)
             : (DateTime?)null;
 
-        var incrementId = _periodStartDate.ToString("yyyy-MM-dd");
+        var incrementId = periodStartDate.ToString("yyyy-MM-dd");
 
         return new ExecutionPlan(
             IncrementId: incrementId,
-            IncrementStart: _periodStartDate,
-            IncrementEnd: _periodStartDate.AddDays(7),
+            IncrementStart: periodStartDate,
+            IncrementEnd: periodStartDate.AddDays(7),
             Tasks: tasks.AsReadOnly(),
             TaskChain: BuildTaskChain(tasks),
             TotalValidTasks: validCount,
@@ -308,6 +383,7 @@ public class ExecutionPlanCoordinatorGrain : Grain, IExecutionPlanCoordinatorGra
         visited.Add(taskId);
         chain.Add(taskId);
 
+        // Find children: tasks that depend on this task
         var children = tasks
             .Where(t => t.PrerequisiteTaskIds.Contains(taskId))
             .Select(t => t.TaskIdString)

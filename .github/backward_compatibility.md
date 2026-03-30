@@ -11,7 +11,7 @@ metadata:
 
 ## Summary
 
-Created a backward-compatible redirect file at `.github/copilot_instructions.md` that points to the full instruction set in `docs/` directory, enabling both access patterns while maintaining the standard AI agent discoverability.
+Created a backward-compatible navigation index at `.github/copilot_instructions.md` that points to the full documentation in `docs/instructions/` directory and test data in `docs/data/`. The docs.csproj automatically includes all markdown, CSV, and text files, enabling centralized documentation management within the solution structure.
 
 ---
 
@@ -20,24 +20,48 @@ Created a backward-compatible redirect file at `.github/copilot_instructions.md`
 ```
 Repository/
 ├── .github/
-│   ├── copilot_instructions.md      ⭐ NEW: Redirect/Index (8.51 KB)
+│   ├── copilot_instructions.md      ⭐ REDIRECT/INDEX (points to docs/)
+│   ├── backward_compatibility.md    (this file)
 │   ├── workflows/                   (existing)
 │   └── requirements.md              (existing)
 │
-├── docs/                            ⭐ PRIMARY LOCATION
-│   ├── copilot_instructions.md      (30.46 KB, v1.3.1)
-│   ├── index.md                     (navigation)
-│   ├── quick_start.md               (5-minute guide)
-│   ├── patterns_ddd.md              (DDD patterns)
-│   ├── patterns_validation.md       (validation patterns)
-│   ├── patterns_testing.md          (testing patterns)
-│   ├── async_requirements_v1.2.0.md (async reference)
-│   ├── copilot_instructions_additions.md
-│   ├── summary_v1.3.0.md
-│   ├── migration_summary.md
-│   └── completion_report.md
+├── docs/                            ⭐ PRIMARY LOCATION (included in docs.csproj)
+│   ├── docs.csproj                  (MSBuild includes all *.md, *.csv, *.txt)
+│   ├── instructions/                📚 ALL DOCUMENTATION
+│   │   ├── index.md                 (navigation hub)
+│   │   ├── readme.md                (overview)
+│   │   ├── architecture/            (system design)
+│   │   │   ├── README.md
+│   │   │   ├── agent-quick-reference.md
+│   │   │   ├── implementation-plan-subagent.md
+│   │   │   └── volatility-based-system-design.md
+│   │   ├── business/                (requirements & planning)
+│   │   │   ├── README.md
+│   │   │   ├── 01-architecture-requirements.md
+│   │   │   ├── 02-execution-sequencing-pipeline.md
+│   │   │   ├── 03-orleans-aspire-architecture.md
+│   │   │   ├── 04-implementation-plan-phase-2.md
+│   │   │   └── 05-technology-stack-desktop-gui.md
+│   │   ├── patterns/                (design patterns)
+│   │   │   ├── README.md
+│   │   │   ├── 01-ddd.md            (Domain-Driven Design)
+│   │   │   ├── 02-validation.md     (Validation & Error Handling)
+│   │   │   └── 03-testing.md        (Testing Patterns)
+│   │   ├── standards/               (coding standards)
+│   │   │   ├── README.md
+│   │   │   ├── 01-coding-standards.md
+│   │   │   ├── 02-async-requirements.md
+│   │   │   └── 03-code-quality-architecture.md
+│   │   ├── PHASE_2_IMPLEMENTATION_SUMMARY.md
+│   │   ├── PHASE_2_REQUIREMENTS_SUMMARY.md
+│   │   └── [other reference docs]
+│   │
+│   └── data/                        📊 TEST DATA (included in docs.csproj)
+│       ├── task_definitions.csv     (task manifest data)
+│       ├── execution_durations.csv  (performance metrics)
+│       └── intake_events.csv        (event samples)
 │
-├── Dependencies.slnx                ✅ UPDATED: Both locations
+├── App.TaskScheduler.slnx           ✅ UPDATED: All 6 projects + docs
 ├── src/
 └── tests/
 ```
@@ -66,55 +90,53 @@ docs/copilot_instructions.md
 
 ### Pattern 3: Solution Explorer
 ```
-Solution Structure (Dependencies.slnx):
+Solution Structure (App.TaskScheduler.slnx):
 ├── /.github/
-│   └── copilot_instructions.md       (redirect)
+│   └── copilot_instructions.md       (redirect to docs/instructions/)
 └── /docs/
-    ├── copilot_instructions.md       (full)
-    ├── index.md
-    ├── patterns_*.md
-    └── [8 other files]
+    ├── docs.csproj                   (packages all files)
+    ├── instructions/                 (all documentation)
+    │   ├── index.md
+    │   ├── readme.md
+    │   ├── architecture/*.md
+    │   ├── business/*.md
+    │   ├── patterns/*.md
+    │   ├── standards/*.md
+    │   └── PHASE_2_*.md
+    └── data/                         (test data)
+        ├── task_definitions.csv
+        ├── execution_durations.csv
+        └── intake_events.csv
 ```
 
 ---
 
 ## Redirect File Contents
 
-The `.github/copilot_instructions.md` file includes:
+The `.github/copilot_instructions.md` file is a navigation index that includes:
 
-✅ **Metadata**
-- Version 1.3.1
+✅ **Metadata Section**
+- Version reference (points to docs/instructions)
 - Type: index_redirect
-- Clear notice: "Full content moved to /docs/"
+- Clear notice: "Full content in /docs/instructions/"
 
-✅ **Navigation**
-- Direct links to all docs/ files
-- Quick links to critical rules
-- Pattern deep-dive references
+✅ **Navigation Links**
+- Start here section → docs/instructions/index.md
+- Critical rules → docs/instructions/standards/02-async-requirements.md, etc.
+- Pattern guides → docs/instructions/patterns/01-ddd.md, 02-validation.md, etc.
+- Business docs → docs/instructions/business/README.md
+- Architecture → docs/instructions/architecture/README.md
+- Test data → docs/data/
 
-✅ **Critical Rules Summary**
-- Async methods (CRITICAL)
-- Primitive obsession avoidance
-- Immutability requirements
-- Sealed classes rule
-- Strong typing requirement
+✅ **Quick Reference Tables**
+- Critical rules (6) with direct links
+- High-priority rules (3) with direct links
+- All links target the actual docs/instructions/ files
 
-✅ **Quick Access Table**
-- All 6 critical rules with links
-- 5 high-priority rules with links
-- All major sections cross-referenced
-
-✅ **Complete File Inventory**
-- Lists all 11 files with size and version
-- Total: 101.5 KB
-
-✅ **FAQ**
-- Common questions and references
-- Migration explanation
-
-✅ **Version Information**
-- Current versions of all files
-- Status (✅ Current)
+✅ **Developer Convenience**
+- Quick-access shell commands for using docs
+- File paths for all major documentation areas
+- Data file locations for test/reference data
 
 ---
 
@@ -128,18 +150,19 @@ The `.github/copilot_instructions.md` file includes:
 ✅ No learning curve - backward compatible  
 
 ### For AI Agents
-✅ Discover full instructions at standard `docs/` location  
-✅ Primary file: `docs/copilot_instructions.md` (v1.3.1)  
-✅ Deep-dive guides in `docs/patterns_*.md`  
-✅ Navigation and cross-references in `docs/index.md`  
+✅ Discover full documentation at standard `docs/instructions/` location  
+✅ Primary index file: `docs/instructions/index.md`  
+✅ Deep-dive guides in `docs/instructions/patterns/`  
+✅ Standards and requirements in `docs/instructions/standards/`  
+✅ Test data included in `docs/data/` (via docs.csproj)  
 ✅ Optimal directory structure for AI crawling  
 
 ### For Solution
-✅ Both locations registered in `Dependencies.slnx`  
-✅ Solution explorer shows both paths  
-✅ No duplicated content (redirect only)  
-✅ Clean organization  
-✅ Future-proof structure  
+✅ Both GitHub docs and docs/ project registered in `App.TaskScheduler.slnx`  
+✅ Solution explorer shows organized structure  
+✅ docs.csproj automatically includes all *.md, *.pdf, *.csv, *.txt files  
+✅ Clean organization with instructions/ and data/ subfolders  
+✅ Future-proof structure for documentation tools  
 
 ### For Repository
 ✅ Industry standard convention (docs/ for docs)  
@@ -154,15 +177,40 @@ The `.github/copilot_instructions.md` file includes:
 
 ### Redirect File `.github/copilot_instructions.md`
 
-**Type**: Index/Navigation File  
-**Size**: 8.51 KB (compressed)  
+**Type**: Navigation Index / Redirect File  
+**Size**: ~3.5 KB (compressed index)  
+**Purpose**: Quick access point to all documentation in docs/instructions/
 **Content**: 
-- Metadata and redirect notice
-- Quick links (22 direct references)
-- Critical rules summary (11 rules with links)
-- File inventory table
-- FAQ with answers
-- Version information
+- Metadata header with redirect notice
+- Quick links to major documentation sections
+- Critical rules summary table with links
+- High-priority rules table with links
+- Developer convenience commands
+- Backward compatibility for old path references
+
+### Primary Documentation Location `docs/instructions/`
+
+**Type**: Comprehensive documentation hub  
+**Size**: 25+ KB across multiple files  
+**Purpose**: Full reference material for developers and AI agents
+**Content Structure**:
+- `index.md` - Main navigation and overview
+- `readme.md` - Getting started guide
+- `architecture/` - System design documentation (4 files)
+- `business/` - Requirements and planning (6 files)
+- `patterns/` - Design patterns (4 files)
+- `standards/` - Coding standards (4 files)
+- `PHASE_2_*.md` - Implementation summaries
+
+### Test Data Location `docs/data/`
+
+**Type**: CSV data files for testing and reference  
+**Size**: ~15 KB across 3 files  
+**Purpose**: Reference data for task definitions and execution metrics
+**Content**:
+- `task_definitions.csv` - Manifest of test tasks
+- `execution_durations.csv` - Performance baseline data
+- `intake_events.csv` - Sample event data
 
 **Purpose**:
 1. Maintain backward compatibility

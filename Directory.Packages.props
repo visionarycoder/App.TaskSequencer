@@ -1,0 +1,81 @@
+<Project>
+  <!-- Central NuGet Package Version Management
+       This file centralizes package versions for all projects in the solution.
+       Projects reference packages without versions; versions are managed here.
+       See: https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackagesVersion>1.0</CentralPackagesVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft Extensions & Hosting -->
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+
+    <!-- Orleans Framework -->
+    <PackageVersion Include="Microsoft.Orleans.Client" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Orleans.Sdk" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Orleans.Server" Version="10.0.1" />
+
+    <!-- Data Processing -->
+    <PackageVersion Include="CsvHelper" Version="30.0.0" />
+
+    <!-- Community Toolkit -->
+    <PackageVersion Include="CommunityToolkit.Diagnostics" Version="8.2.2" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+
+    <!-- MAUI (Client Desktop) -->
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.0" />
+
+    <!-- Logging & Diagnostics -->
+    <PackageVersion Include="Serilog" Version="4.1.1" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="2.0.0" />
+
+    <!-- Resilience & Fault Handling -->
+    <PackageVersion Include="Polly" Version="8.4.1" />
+
+    <!-- Console UI Enhancement -->
+    <PackageVersion Include="Spectre.Console" Version="0.49.1" />
+
+    <!-- String & Time Formatting -->
+    <PackageVersion Include="Humanizer" Version="2.14.1" />
+
+    <!-- Performance Benchmarking -->
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+
+    <!-- Testing Packages -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.1" />
+    <PackageVersion Include="Moq" Version="4.20.71" />
+
+    <!-- Code Quality & Analysis (Optional but recommended) -->
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.0" />
+
+    <!-- Roslyn Code Generation (AutoMapper alternative for object mapping) -->
+    <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.9.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+
+    <!-- Microsoft Aspire (Service Discovery, Health Checks, Orchestration) -->
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="8.2.0" />
+    <PackageVersion Include="Aspire.Hosting" Version="9.0.0" />
+
+    <!-- OpenTelemetry for Distributed Tracing (Aspire-compatible) -->
+    <PackageVersion Include="OpenTelemetry.Api" Version="1.9.1" />
+    <PackageVersion Include="OpenTelemetry.Sdk" Version="1.9.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.9.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.10.1" />
+  </ItemGroup>
+</Project>

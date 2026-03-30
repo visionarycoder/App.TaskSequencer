@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.ViolationsPage"
+    Title="Deadline Violations">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" Spacing="10">
+        <!-- Header -->
+        <VerticalStackLayout Spacing="5">
+            <Label Text="Deadline Violations Report" FontSize="24" FontAttributes="Bold" />
+            <Label Text="{Binding StatusMessage}" FontSize="12" TextColor="Gray" />
+        </VerticalStackLayout>
+
+        <!-- Summary Statistics -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" ColumnSpacing="10" RowSpacing="10">
+            <Frame BorderColor="#FF3B30" CornerRadius="8" Padding="10">
+                <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                    <Label Text="Total" FontSize="11" TextColor="Gray" HorizontalOptions="Center" />
+                    <Label Text="{Binding TotalViolations}" FontSize="20" FontAttributes="Bold" TextColor="#FF3B30" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="#FF3B30" CornerRadius="8" Padding="10" Grid.Column="1">
+                <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                    <Label Text="Critical" FontSize="11" TextColor="Gray" HorizontalOptions="Center" />
+                    <Label Text="{Binding CriticalViolations}" FontSize="20" FontAttributes="Bold" TextColor="#FF3B30" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="#FF9500" CornerRadius="8" Padding="10" Grid.Column="2">
+                <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                    <Label Text="Moderate" FontSize="11" TextColor="Gray" HorizontalOptions="Center" />
+                    <Label Text="{Binding ModerateViolations}" FontSize="20" FontAttributes="Bold" TextColor="#FF9500" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="#FFD60A" CornerRadius="8" Padding="10" Grid.Column="3">
+                <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                    <Label Text="Minor" FontSize="11" TextColor="Gray" HorizontalOptions="Center" />
+                    <Label Text="{Binding MinorViolations}" FontSize="20" FontAttributes="Bold" TextColor="#FFD60A" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+        <!-- Violations Table -->
+        <VerticalStackLayout Grid.Row="2" Spacing="0">
+            <!-- Table Header -->
+            <Grid ColumnDefinitions="150,150,150,150,100" Padding="10" BackgroundColor="#F0F0F0" IsVisible="{Binding Violations.Count, Converter={StaticResource IntToBoolConverter}}">
+                <Label Text="Task ID" FontSize="11" FontAttributes="Bold" />
+                <Label Text="Deadline" Grid.Column="1" FontSize="11" FontAttributes="Bold" />
+                <Label Text="Planned Completion" Grid.Column="2" FontSize="11" FontAttributes="Bold" />
+                <Label Text="Miss (min)" Grid.Column="3" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" />
+                <Label Text="Severity" Grid.Column="4" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" />
+            </Grid>
+
+            <!-- Violations List -->
+            <CollectionView 
+                ItemsSource="{Binding Violations}" 
+                SelectionMode="Single" 
+                SelectionChangedCommand="{Binding SelectViolationCommand}"
+                IsVisible="{Binding Violations.Count, Converter={StaticResource IntToBoolConverter}}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="150,150,150,150,100" Padding="10" Margin="0,1">
+                            <!-- Color indicator -->
+                            <Grid.Background>
+                                <SolidColorBrush Color="{Binding Severity, Converter={StaticResource SeverityToColorConverter}, ConverterParameter='Light'}" />
+                            </Grid.Background>
+
+                            <!-- Task ID -->
+                            <Label Text="{Binding TaskId}" FontSize="10" />
+
+                            <!-- Deadline -->
+                            <Label 
+                                Text="{Binding DeadlineTime, StringFormat='{0:g}'}" 
+                                Grid.Column="1" 
+                                FontSize="10" />
+
+                            <!-- Planned Completion -->
+                            <Label 
+                                Text="{Binding PlannedCompletionTime, StringFormat='{0:g}'}" 
+                                Grid.Column="2" 
+                                FontSize="10" />
+
+                            <!-- Miss Minutes -->
+                            <Label 
+                                Text="{Binding MissMinutes, StringFormat='{0:F0}'}" 
+                                Grid.Column="3" 
+                                FontSize="10"
+                                HorizontalOptions="Center"
+                                TextColor="{Binding Severity, Converter={StaticResource SeverityToColorConverter}}" />
+
+                            <!-- Severity Badge -->
+                            <Label 
+                                Text="{Binding Severity}" 
+                                Grid.Column="4" 
+                                FontSize="10"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Center"
+                                TextColor="{Binding Severity, Converter={StaticResource SeverityToColorConverter}}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Empty State -->
+            <VerticalStackLayout 
+                Padding="20" 
+                Spacing="10"
+                HorizontalOptions="Center" 
+                VerticalOptions="Center"
+                IsVisible="{Binding Violations.Count, Converter={StaticResource InvertedIntToBoolConverter}}">
+                <Label Text="✓ No deadline violations found!" FontSize="16" FontAttributes="Bold" TextColor="#34C759" HorizontalOptions="Center" />
+                <Label Text="All tasks can complete by their deadlines." FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+
+        <!-- Details Panel -->
+        <Frame Grid.Row="3" BorderColor="#D0D0D0" CornerRadius="10" Padding="15" IsVisible="{Binding SelectedViolation, Converter={StaticResource NotNullToBoolConverter}}">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Details" FontSize="14" FontAttributes="Bold" />
+                
+                <HorizontalStackLayout Spacing="20">
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Task:" FontSize="11" FontAttributes="Bold" TextColor="Gray" />
+                        <Label Text="{Binding SelectedViolation.TaskId}" FontSize="11" />
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Name:" FontSize="11" FontAttributes="Bold" TextColor="Gray" />
+                        <Label Text="{Binding SelectedViolation.TaskName}" FontSize="11" />
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Miss:" FontSize="11" FontAttributes="Bold" TextColor="Gray" />
+                        <Label 
+                            Text="{Binding SelectedViolation.MissMinutes, StringFormat='{0:F0} minutes'}" 
+                            FontSize="11"
+                            TextColor="{Binding SelectedViolation.Severity, Converter={StaticResource SeverityToColorConverter}}" />
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Action Buttons -->
+        <HorizontalStackLayout Grid.Row="3" Spacing="10" HorizontalOptions="Center" IsVisible="{Binding SelectedViolation, Converter={StaticResource NullToBoolConverter}}">
+            <Button 
+                Text="Export to CSV" 
+                Command="{Binding ExportToCSVCommand}"
+                BackgroundColor="#017AFF" 
+                TextColor="White"
+                Padding="15,5" />
+        </HorizontalStackLayout>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator 
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            Grid.RowSpan="4"
+            Color="#007AFF" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.DashboardPage"
+    Title="Dashboard">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20" Spacing="15">
+        <!-- Header -->
+        <VerticalStackLayout Spacing="5">
+            <Label Text="Execution Plan Dashboard" FontSize="24" FontAttributes="Bold" />
+            <Label Text="{Binding StatusMessage}" FontSize="12" TextColor="Gray" />
+        </VerticalStackLayout>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="10">
+                <!-- Statistics Grid -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                    <!-- Total Tasks -->
+                    <Frame BorderColor="#007AFF" CornerRadius="10" Padding="15">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="Total Tasks" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                            <Label Text="{Binding TotalTasks}" FontSize="28" FontAttributes="Bold" TextColor="#007AFF" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Valid Tasks -->
+                    <Frame BorderColor="#34C759" CornerRadius="10" Padding="15" Grid.Column="1">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="Valid Tasks" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                            <Label Text="{Binding ValidTasks}" FontSize="28" FontAttributes="Bold" TextColor="#34C759" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Invalid Tasks -->
+                    <Frame BorderColor="#FF3B30" CornerRadius="10" Padding="15" Grid.Row="1">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="Invalid Tasks" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                            <Label Text="{Binding InvalidTasks}" FontSize="28" FontAttributes="Bold" TextColor="#FF3B30" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Valid Percentage -->
+                    <Frame BorderColor="#17C957" CornerRadius="10" Padding="15" Grid.Row="1" Grid.Column="1">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="Valid %" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                            <Label Text="{Binding ValidPercentage, StringFormat='{0:F1}%'}" FontSize="28" FontAttributes="Bold" TextColor="#17C957" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- Critical Path Section -->
+                <Frame BorderColor="#FF9500" CornerRadius="10" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Critical Path Analysis" FontSize="16" FontAttributes="Bold" />
+                        
+                        <HorizontalStackLayout Spacing="20">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Completion Time" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding CriticalPathEnd}" FontSize="14" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                            
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Critical Tasks" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding CriticalTaskCount}" FontSize="14" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                            
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Max Parallel Level" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding MaxParallelLevel}" FontSize="14" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Execution Groups" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding ExecutionGroups}" FontSize="14" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Errors Section -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding Errors.Count, Converter={StaticResource IntToBoolConverter}}">
+                    <Frame BorderColor="#FF3B30" CornerRadius="10" Padding="15">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Errors" FontSize="14" FontAttributes="Bold" TextColor="#FF3B30" />
+                            <CollectionView ItemsSource="{Binding Errors}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding}" FontSize="11" TextColor="#FF3B30" LineBreakMode="WordWrap" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
+
+                <!-- Warnings Section -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding Warnings.Count, Converter={StaticResource IntToBoolConverter}}">
+                    <Frame BorderColor="#FF9500" CornerRadius="10" Padding="15">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Warnings" FontSize="14" FontAttributes="Bold" TextColor="#FF9500" />
+                            <CollectionView ItemsSource="{Binding Warnings}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding}" FontSize="11" TextColor="#FF9500" LineBreakMode="WordWrap" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Refresh Button -->
+        <HorizontalStackLayout Grid.Row="2" HorizontalOptions="Center" Spacing="10">
+            <Button 
+                Text="Refresh" 
+                Command="{Binding RefreshCommand}"
+                BackgroundColor="#007AFF" 
+                TextColor="White"
+                WidthRequest="150" />
+        </HorizontalStackLayout>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator 
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            Grid.RowSpan="3"
+            Color="#007AFF" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Description>Documentation files for Task Sequencer</Description>
+  </PropertyGroup>
+  
+  <!-- Include all documentation files preserving directory structure -->       
+  <ItemGroup>
+    <!-- Markdown files -->
+    <None Include="**/*.md" Exclude="**/obj/**;**/bin/**" />
+    <!-- PDF files -->
+    <None Include="**/*.pdf" Exclude="**/obj/**;**/bin/**" />
+    <!-- CSV data files -->
+    <None Include="**/*.csv" Exclude="**/obj/**;**/bin/**" />
+    <!-- Text files -->
+    <None Include="**/*.txt" Exclude="**/obj/**;**/bin/**" />
+  </ItemGroup>
+
+  <!-- Custom target that satisfies "dotnet build" with no-op -->
+  <Target Name="Build" />
+  <Target Name="Rebuild" />
+  <Target Name="Clean" />
+  
+</Project>

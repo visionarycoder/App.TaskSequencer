@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="App.TaskSequencer.Client.Desktop.Maui.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:App.TaskSequencer.Client.Desktop.Maui"
+    xmlns:views="clr-namespace:App.TaskSequencer.Client.Desktop.Maui.Views"
+    Title="Task Sequencer - Execution Plan">
+
+    <TabBar>
+        <ShellContent
+            Title="Settings"
+            Icon="https://microsoft.com/favicon.ico"
+            ContentTemplate="{DataTemplate views:SettingsPage}"
+            Route="SettingsPage" />
+
+        <ShellContent
+            Title="Dashboard"
+            Icon="https://microsoft.com/favicon.ico"
+            ContentTemplate="{DataTemplate views:DashboardPage}"
+            Route="DashboardPage" />
+
+        <ShellContent
+            Title="Timeline"
+            Icon="https://microsoft.com/favicon.ico"
+            ContentTemplate="{DataTemplate views:TimelinePage}"
+            Route="TimelinePage" />
+
+        <ShellContent
+            Title="Violations"
+            Icon="https://microsoft.com/favicon.ico"
+            ContentTemplate="{DataTemplate views:ViolationsPage}"
+            Route="ViolationsPage" />
+    </TabBar>
+
+</Shell>

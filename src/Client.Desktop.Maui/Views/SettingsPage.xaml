@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.SettingsPage"
+    Title="Settings - Load Execution Plan">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20" Spacing="15">
+        <!-- Header -->
+        <VerticalStackLayout Spacing="10">
+            <Label Text="Task Sequencer - Execution Planning" FontSize="24" FontAttributes="Bold" />
+            <Label Text="Select CSV files and execution period to generate execution plan" FontSize="14" TextColor="Gray" />
+        </VerticalStackLayout>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="10">
+                <!-- Task Definitions Section -->
+                <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Task Definitions" FontSize="16" FontAttributes="Bold" />
+                        <Label Text="{Binding TaskDefinitionsPath, StringFormat='Selected: {0}'}" FontSize="12" TextColor="Gray" />
+                        <Button 
+                            Text="Select Task Definitions CSV" 
+                            Command="{Binding SelectTaskDefinitionsCommand}"
+                            BackgroundColor="#007AFF" 
+                            TextColor="White" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Intake Events Section -->
+                <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Intake Events" FontSize="16" FontAttributes="Bold" />
+                        <Label Text="{Binding IntakeEventsPath, StringFormat='Selected: {0}'}" FontSize="12" TextColor="Gray" />
+                        <Button 
+                            Text="Select Intake Events CSV" 
+                            Command="{Binding SelectIntakeEventsCommand}"
+                            BackgroundColor="#007AFF" 
+                            TextColor="White" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Duration Manifest Section (Optional) -->
+                <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Duration Manifest (Optional)" FontSize="16" FontAttributes="Bold" />
+                        <Label Text="{Binding DurationManifestPath, StringFormat='Selected: {0}'}" FontSize="12" TextColor="Gray" />
+                        <Button 
+                            Text="Select Duration Manifest CSV" 
+                            Command="{Binding SelectDurationManifestCommand}"
+                            BackgroundColor="#007AFF" 
+                            TextColor="White" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Increment Period Section -->
+                <Frame BorderColor="Gray" CornerRadius="10" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Execution Period" FontSize="16" FontAttributes="Bold" />
+                        
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="Start:" VerticalOptions="Center" />
+                            <DatePicker Date="{Binding IncrementStart}" HorizontalOptions="FillAndExpand" />
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="End:" VerticalOptions="Center" />
+                            <DatePicker Date="{Binding IncrementEnd}" HorizontalOptions="FillAndExpand" />
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="5">
+                            <Button 
+                                Text="Today" 
+                                Command="{Binding SetIncrementTodayCommand}"
+                                HorizontalOptions="FillAndExpand" 
+                                FontSize="12" />
+                            <Button 
+                                Text="This Week" 
+                                Command="{Binding SetIncrementThisWeekCommand}"
+                                HorizontalOptions="FillAndExpand" 
+                                FontSize="12" />
+                            <Button 
+                                Text="This Month" 
+                                Command="{Binding SetIncrementThisMonthCommand}"
+                                HorizontalOptions="FillAndExpand" 
+                                FontSize="12" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Status and Messages -->
+                <Frame BorderColor="#FFB000" CornerRadius="10" Padding="15">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Status" FontSize="14" FontAttributes="Bold" />
+                        <Label Text="{Binding StatusMessage}" FontSize="12" TextColor="#007AFF" />
+
+                        <!-- Errors -->
+                        <VerticalStackLayout Spacing="5" IsVisible="{Binding Errors.Count, Converter={StaticResource IntToBoolConverter}}">
+                            <Label Text="Errors:" FontSize="12" FontAttributes="Bold" TextColor="Red" />
+                            <CollectionView ItemsSource="{Binding Errors}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding}" FontSize="11" TextColor="Red" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+
+                        <!-- Warnings -->
+                        <VerticalStackLayout Spacing="5" IsVisible="{Binding Warnings.Count, Converter={StaticResource IntToBoolConverter}}">
+                            <Label Text="Warnings:" FontSize="12" FontAttributes="Bold" TextColor="Orange" />
+                            <CollectionView ItemsSource="{Binding Warnings}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding}" FontSize="11" TextColor="Orange" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Action Buttons -->
+        <HorizontalStackLayout Grid.Row="2" Spacing="10" HorizontalOptions="CenterAndExpand">
+            <Button 
+                Text="Clear Files" 
+                Command="{Binding ClearFilesCommand}"
+                BackgroundColor="#FF3B30" 
+                TextColor="White"
+                WidthRequest="150" />
+            <Button 
+                Text="Load & Plan" 
+                Command="{Binding LoadAndPlanCommand}"
+                BackgroundColor="#34C759" 
+                TextColor="White"
+                WidthRequest="150"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}" />
+        </HorizontalStackLayout>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator 
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            Grid.RowSpan="3"
+            Color="#007AFF" />
+    </Grid>
+</ContentPage>

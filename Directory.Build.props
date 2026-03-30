@@ -1,0 +1,68 @@
+<Project>
+  <!-- Central Build Configuration for All Projects
+       This file contains shared build settings applied to all projects in the solution.
+       See: https://learn.microsoft.com/en-us/visualstudio/msbuild/customize-your-build
+  -->
+
+  <!-- ========== Shared Properties ========== -->
+  <PropertyGroup>
+    <!-- Company and Product Info -->
+    <Company>VisionaryCoder</Company>
+    <Product>Task Sequencer</Product>
+    <Authors>Ivan</Authors>
+    <RepositoryUrl>https://github.com/visionarycoder/App.TaskSequencer</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/visionarycoder/App.TaskSequencer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- Version Management (use semantic versioning) -->
+    <VersionPrefix>0.2.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <InformationalVersion>$(VersionPrefix)</InformationalVersion>
+
+    <!-- Language and Runtime Settings -->
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- Code Analysis & Quality -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+
+    <!-- Deterministic builds (for reproducible builds) -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>$(CI)</ContinuousIntegrationBuild>
+
+    <!-- Documentation & Metadata -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- ========== Conditional Properties for Different Project Types ========== -->
+
+  <!-- Settings for Test Projects -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <IsTestProject Condition="$(MSBuildProjectName.Contains('Test'))">true</IsTestProject>
+    <!-- Enable code coverage for test projects -->
+    <CollectCoverageMetadata>true</CollectCoverageMetadata>
+  </PropertyGroup>
+
+  <!-- Settings for Library Projects -->
+  <PropertyGroup Condition="'$(IsLibrary)' == 'true' or ($(IsTestProject) != 'true' and '$(OutputType)' != 'Exe' and '$(OutputType)' != 'WinExe')">
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- ========== StyleCop Configuration ========== -->
+  <PropertyGroup>
+    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);StyleCopRules</AdditionalFileItemNames>
+  </PropertyGroup>
+
+  <!-- ========== Default Target Frameworks ========== -->
+  <!-- Individual projects can override these as needed -->
+  <PropertyGroup Condition="'$(TargetFramework)' == ''">
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+</Project>

@@ -2,6 +2,19 @@
   <Folder Name="/.github/">
     <File Path=".github/copilot_instructions.md" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="App.TaskSequencer.code-workspace" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="FEATURE_IMPLEMENTATION_PLAN.md" />
+    <File Path="readme.md" />
+    <File Path="start-all.bat" />
+    <File Path="start-aspire.bat" />
+    <File Path="start-console.bat" />
+    <File Path="start-maui.bat" />
+    <File Path="start-orleans.bat" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Client.Desktop.Console/Client.Desktop.Console.csproj" />
     <Project Path="src/Client.Desktop.Maui/Client.Desktop.Maui.csproj" />

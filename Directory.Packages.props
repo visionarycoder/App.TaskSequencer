@@ -18,6 +18,7 @@
     <PackageVersion Include="Microsoft.Orleans.Client" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Orleans.Sdk" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Orleans.Server" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Orleans.Runtime" Version="10.0.1" />
     <!-- Data Processing -->
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <!-- Community Toolkit -->

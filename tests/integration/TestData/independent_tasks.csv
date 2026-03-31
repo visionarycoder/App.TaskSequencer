@@ -1,0 +1,6 @@
+TaskId,TaskName,ExecutionType,ScheduleType,DurationMinutes,Prerequisites,ExecutionDays,ExecutionTimes
+1,Task 1,Scheduled,Recurring,20,,Monday,08:00:00
+2,Task 2,Scheduled,Recurring,20,,Monday,09:00:00
+3,Task 3,Scheduled,Recurring,20,,Monday,10:00:00
+4,Task 4,Scheduled,Recurring,20,,Monday,11:00:00
+5,Task 5,Scheduled,Recurring,20,,Monday,12:00:00

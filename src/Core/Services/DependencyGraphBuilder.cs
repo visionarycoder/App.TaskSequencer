@@ -45,18 +45,28 @@ public class DependencyGraphBuilder
                 taskToDependents[evt.TaskId] = new List<string>().AsReadOnly();
         }
 
-        // Resolve prerequisites using existing resolver
+        // Build prerequisite relationships from ExecutionEventDefinition.PrerequisiteTaskIds
+        // Extract unique prerequisite relationships at the task level
+        var prereqsByTask = new Dictionary<string, HashSet<string>>();
         foreach (var evt in events)
         {
-            ct.ThrowIfCancellationRequested();
+            if (!prereqsByTask.ContainsKey(evt.TaskId))
+                prereqsByTask[evt.TaskId] = new HashSet<string>();
 
-            var resolvedPrereqs = dependencyResolver.ResolvePrerequisites(evt, events.ToList());
-            var prereqIds = resolvedPrereqs
-                .Select(p => p.TaskId)
-                .Distinct()
-                .ToList();
+            foreach (var prereqTaskId in evt.PrerequisiteTaskIds)
+            {
+                prereqsByTask[evt.TaskId].Add(prereqTaskId);
+            }
+        }
 
-            taskToPrerequisites[evt.TaskId] = prereqIds.AsReadOnly();
+        // Populate taskToPrerequisites and taskToDependents
+        foreach (var taskId in allTaskIds)
+        {
+            var prereqIds = prereqsByTask.ContainsKey(taskId) 
+                ? prereqsByTask[taskId].Where(p => allTaskIds.Contains(p)).ToList()  // Filter to only existing tasks
+                : new List<string>();
+            
+            taskToPrerequisites[taskId] = prereqIds.AsReadOnly();
 
             // Build dependents map (inverse of prerequisites)
             foreach (var prereqId in prereqIds)
@@ -65,9 +75,9 @@ public class DependencyGraphBuilder
                     taskToDependents[prereqId] = new List<string>().AsReadOnly();
 
                 var existingDependents = taskToDependents[prereqId].ToList();
-                if (!existingDependents.Contains(evt.TaskId))
+                if (!existingDependents.Contains(taskId))
                 {
-                    existingDependents.Add(evt.TaskId);
+                    existingDependents.Add(taskId);
                     taskToDependents[prereqId] = existingDependents.AsReadOnly();
                 }
             }

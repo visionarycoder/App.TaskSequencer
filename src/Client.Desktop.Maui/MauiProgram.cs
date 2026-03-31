@@ -1,9 +1,8 @@
 ﻿using App.TaskSequencer.Client.Desktop.Maui.Services;
 using App.TaskSequencer.Client.Desktop.Maui.ViewModels;
-using App.TaskSequencer.Core.Services;
+using Core.Services;
 using Microsoft.Extensions.Logging;
 using Orleans;
-using Serilog;
 
 namespace App.TaskSequencer.Client.Desktop.Maui;
 
@@ -13,12 +12,6 @@ public static class MauiProgram
 
 	public static MauiApp CreateMauiApp()
 	{
-		// Configure Serilog
-		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Information()
-			.WriteTo.Debug()
-			.CreateLogger();
-
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
@@ -35,11 +28,12 @@ public static class MauiProgram
 		// Register Orleans client
 		builder.Services.AddSingleton<IClusterClient>(sp =>
 		{
-			var client = new ClientBuilder()
-				.UseLocalhostClustering()
-				.ConfigureLogging(logging => logging.AddDebug())
-				.Build();
-			return client;
+			//TODO: Fix ClientBuilder initialization - requires IServiceCollection and IConfiguration
+			// var client = new ClientBuilder(sp as IServiceCollection, sp.GetRequiredService<IConfiguration>())
+			// 	.UseLocalhostClustering()
+			// 	.Build();
+			// return client;
+			throw new NotImplementedException("Orleans client initialization not yet implemented");
 		});
 
 		// Register Core services
@@ -52,7 +46,8 @@ public static class MauiProgram
 		builder.Services.AddScoped<ExecutionPlanOrchestrator>();
 
 		// Register MAUI services
-		builder.Services.AddScoped<ExecutionPlanService>();
+		//TODO: ExecutionPlanService needs proper Orleans client initialization
+		//builder.Services.AddScoped<ExecutionPlanService>();
 
 		// Register ViewModels
 		builder.Services.AddScoped<DashboardViewModel>();
@@ -63,28 +58,29 @@ public static class MauiProgram
 		var app = builder.Build();
 		
 		// Initialize Orleans client connection
-		_ = InitializeOrleansClient(app.Services);
+		//TODO: Initialize Orleans client when proper configuration is available
+		//_ = InitializeOrleansClient(app.Services);
 		
 		return app;
 	}
 
-	/// <summary>
-	/// Initializes the Orleans grain client for connection to the Orleans silo.
-	/// Expects silo to be running on localhost:11111 (started by Aspire.AppHost).
-	/// </summary>
-	private static async Task InitializeOrleansClient(IServiceProvider serviceProvider)
-	{
-		try
-		{
-			GrainClient = serviceProvider.GetRequiredService<IClusterClient>();
-			await GrainClient.Connect();
-			Log.Information("✓ Successfully connected to Orleans silo");
-		}
-		catch (Exception ex)
-		{
-			Log.Error($"✗ Failed to connect to Orleans silo: {ex.Message}");
-		}
-	}
+//	/// <summary>
+//	/// Initializes the Orleans grain client for connection to the Orleans silo.
+//	/// Expects silo to be running on localhost:11111 (started by Aspire.AppHost).
+//	/// </summary>
+//	private static async Task InitializeOrleansClient(IServiceProvider serviceProvider)
+//	{
+//		try
+//		{
+//			GrainClient = serviceProvider.GetRequiredService<IClusterClient>();
+//			await GrainClient.Connect();
+//			Log.Information("✓ Successfully connected to Orleans silo");
+//		}
+//		catch (Exception ex)
+//		{
+//			Log.Error($"✗ Failed to connect to Orleans silo: {ex.Message}");
+//		}
+//	}
 
 	/// <summary>
 	/// Gets the Orleans grain client for making grain calls throughout the app.

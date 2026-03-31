@@ -1,6 +1,4 @@
-using App.TaskSequencer.Domain.Foundation;
-
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Represents a task's intake event requirement (deadline constraint).

@@ -1,10 +1,6 @@
-using App.TaskSequencer.Domain.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Core.Models;
 
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Builds and validates the dependency graph from execution events.
@@ -202,7 +198,7 @@ public class DependencyGraphBuilder
         var dependents = new Dictionary<string, List<string>>();
         foreach (var taskId in allTaskIds)
         {
-            dependents[taskId] = new List<string>();
+            dependents[taskId] = [];
         }
 
         foreach (var (task, prereqs) in taskToPrerequisites)
@@ -279,7 +275,7 @@ internal class DependencyGraph : IDependencyGraph
         // Lazy compute all depths on first access
         if (_depthFromRoot == null)
         {
-            _depthFromRoot = new Dictionary<string, int>();
+            _depthFromRoot = [];
             foreach (var task in _topologicalOrder)
             {
                 ComputeDepthFromRootHelper(task, _depthFromRoot);
@@ -297,7 +293,7 @@ internal class DependencyGraph : IDependencyGraph
         // Lazy compute all depths on first access
         if (_depthToLeaf == null)
         {
-            _depthToLeaf = new Dictionary<string, int>();
+            _depthToLeaf = [];
             var reverseTopo = _topologicalOrder.Reverse().ToList();
             foreach (var task in reverseTopo)
             {

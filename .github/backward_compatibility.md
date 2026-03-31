@@ -31,24 +31,24 @@ Repository/
 │   │   ├── index.md                 (navigation hub)
 │   │   ├── readme.md                (overview)
 │   │   ├── architecture/            (system design)
-│   │   │   ├── README.md
+│   │   │   ├── readme.md
 │   │   │   ├── agent-quick-reference.md
 │   │   │   ├── implementation-plan-subagent.md
 │   │   │   └── volatility-based-system-design.md
 │   │   ├── business/                (requirements & planning)
-│   │   │   ├── README.md
+│   │   │   ├── readme.md
 │   │   │   ├── 01-architecture-requirements.md
 │   │   │   ├── 02-execution-sequencing-pipeline.md
 │   │   │   ├── 03-orleans-aspire-architecture.md
 │   │   │   ├── 04-implementation-plan-phase-2.md
 │   │   │   └── 05-technology-stack-desktop-gui.md
 │   │   ├── patterns/                (design patterns)
-│   │   │   ├── README.md
+│   │   │   ├── readme.md
 │   │   │   ├── 01-ddd.md            (Domain-Driven Design)
 │   │   │   ├── 02-validation.md     (Validation & Error Handling)
 │   │   │   └── 03-testing.md        (Testing Patterns)
 │   │   ├── standards/               (coding standards)
-│   │   │   ├── README.md
+│   │   │   ├── readme.md
 │   │   │   ├── 01-coding-standards.md
 │   │   │   ├── 02-async-requirements.md
 │   │   │   └── 03-code-quality-architecture.md
@@ -124,8 +124,8 @@ The `.github/copilot_instructions.md` file is a navigation index that includes:
 - Start here section → docs/instructions/index.md
 - Critical rules → docs/instructions/standards/02-async-requirements.md, etc.
 - Pattern guides → docs/instructions/patterns/01-ddd.md, 02-validation.md, etc.
-- Business docs → docs/instructions/business/README.md
-- Architecture → docs/instructions/architecture/README.md
+- Business docs → docs/instructions/business/readme.md
+- Architecture → docs/instructions/architecture/readme.md
 - Test data → docs/data/
 
 ✅ **Quick Reference Tables**
@@ -327,7 +327,7 @@ docs/index.md (navigation)
 ## Next Steps (If Needed)
 
 ### Optional: Update Documentation Links
-- If you have a README.md or similar, update links to docs/
+- If you have a readme.md or similar, update links to docs/
 - Example: `[Instructions](docs/copilot_instructions.md)`
 
 ### Optional: GitHub Pages

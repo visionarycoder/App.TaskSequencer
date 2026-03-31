@@ -1,4 +1,4 @@
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Represents the validation/execution status of an ExecutionInstance.

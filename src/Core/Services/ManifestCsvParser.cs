@@ -1,9 +1,8 @@
 using System.Globalization;
+using Core.Models;
 using CsvHelper;
-using CsvHelper.Configuration;
-using App.TaskSequencer.Domain.Models;
 
-namespace App.TaskSequencer.Infrastructure.Persistence;
+namespace Core.Services;
 
 /// <summary>
 /// Service for parsing CSV files containing task definitions, intake requirements, and duration history.
@@ -61,7 +60,7 @@ public class ManifestCsvParser
     public async Task<List<ExecutionDurationManifest>> ParseExecutionDurationCsvAsync(string filePath)
     {
         if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-            return new List<ExecutionDurationManifest>(); // Optional file
+            return []; // Optional file
 
         using var reader = new StreamReader(filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -87,7 +86,7 @@ public class ManifestCsvParser
         var intakeEvents = ParseIntakeEventCsvAsync(intakeEventPath).GetAwaiter().GetResult();
         var durations = !string.IsNullOrEmpty(durationHistoryPath)
             ? ParseExecutionDurationCsvAsync(durationHistoryPath).GetAwaiter().GetResult()
-            : new List<ExecutionDurationManifest>();
+            : [];
 
         return (tasks, intakeEvents, durations);
     }

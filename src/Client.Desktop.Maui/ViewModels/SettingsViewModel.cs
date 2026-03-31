@@ -37,10 +37,10 @@ public partial class SettingsViewModel : ObservableObject
     private string statusMessage = "Ready";
 
     [ObservableProperty]
-    private ObservableCollection<string> errors = new();
+    private ObservableCollection<string> errors = [];
 
     [ObservableProperty]
-    private ObservableCollection<string> warnings = new();
+    private ObservableCollection<string> warnings = [];
 
     public event EventHandler? ExecutionPlanLoaded;
 

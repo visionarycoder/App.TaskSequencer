@@ -1,4 +1,4 @@
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Represents a scheduled execution instance of a task.

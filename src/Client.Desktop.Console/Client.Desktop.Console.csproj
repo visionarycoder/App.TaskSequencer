@@ -12,14 +12,11 @@
     <PackageReference Include="Microsoft.Orleans.Sdk" />
     <PackageReference Include="Microsoft.Orleans.Server" />
     <PackageReference Include="CommunityToolkit.Diagnostics" />
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Serilog.Sinks.Console" />
-    <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Polly" />
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="Humanizer" />
     <PackageReference Include="OpenTelemetry.Api" />
-    <PackageReference Include="OpenTelemetry.Sdk" />
+    <PackageReference Include="OpenTelemetry" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
   </ItemGroup>
 

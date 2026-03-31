@@ -13,7 +13,7 @@ public partial class ViolationsViewModel : ObservableObject
     private readonly ExecutionPlanService ExecutionPlanService;
 
     [ObservableProperty]
-    private ObservableCollection<DeadlineViolation> violations = new();
+    private ObservableCollection<DeadlineViolation> violations = [];
 
     [ObservableProperty]
     private int totalViolations;
@@ -72,14 +72,15 @@ public partial class ViolationsViewModel : ObservableObject
 
             using (var writer = new StreamWriter(filePath))
             {
-                await writer.WriteLineAsync("Task ID,Task Name,Deadline,Planned Completion,Miss Minutes,Severity");
+                await writer.WriteLineAsync("Task ID,Task Name,Required End,Projected End,Overdue Minutes");
 
                 foreach (var violation in Violations)
                 {
+                    //TODO: DeadlineViolation model needs Severity property for full export
                     await writer.WriteLineAsync(
                         $"\"{violation.TaskId}\",\"{violation.TaskName}\"," +
-                        $"\"{violation.DeadlineTime:g}\",\"{violation.PlannedCompletionTime:g}\"," +
-                        $"\"{violation.MissMinutes:F2}\",\"{violation.Severity}\"");
+                        $"\"{violation.RequiredEnd:g}\",\"{violation.ProjectedEnd:g}\"," +
+                        $"\"{violation.OverdueMinutes:F2}\"");
                 }
             }
 
@@ -101,9 +102,13 @@ public partial class ViolationsViewModel : ObservableObject
             Violations.Add(violation);
 
         TotalViolations = violations.Count;
-        CriticalViolations = violations.Count(v => v.Severity == "Critical");
-        ModerateViolations = violations.Count(v => v.Severity == "Moderate");
-        MinorViolations = violations.Count(v => v.Severity == "Minor");
+        //TODO: Add Severity property to DeadlineViolation to enable severity-based filtering
+        //CriticalViolations = violations.Count(v => v.Severity == "Critical");
+        //ModerateViolations = violations.Count(v => v.Severity == "Moderate");
+        //MinorViolations = violations.Count(v => v.Severity == "Minor");
+        CriticalViolations = 0;
+        ModerateViolations = 0;
+        MinorViolations = 0;
 
         StatusMessage = $"Found {violations.Count} deadline violations";
     }
@@ -113,10 +118,11 @@ public partial class ViolationsViewModel : ObservableObject
         if (FilterSeverity == "All")
             return; // Show all
 
-        var filtered = Violations.Where(v => v.Severity == FilterSeverity).ToList();
-        Violations.Clear();
-        foreach (var violation in filtered)
-            Violations.Add(violation);
+        //TODO: Implement severity filtering when Severity property is available
+        //var filtered = Violations.Where(v => v.Severity == FilterSeverity).ToList();
+        //Violations.Clear();
+        //foreach (var violation in filtered)
+        //    Violations.Add(violation);
     }
 
     /// <summary>

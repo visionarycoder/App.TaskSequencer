@@ -1,4 +1,4 @@
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Represents duration information with estimation metadata.

@@ -1,9 +1,9 @@
-﻿using Microsoft.UI.Xaml;
+﻿
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace App.TaskSequencer.Client.Desktop.Maui.WinUI;
+namespace App.TaskSequencer.Client.Desktop.Maui.Platforms.Windows;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
@@ -16,7 +16,8 @@ public partial class App : MauiWinUIApplication
 	/// </summary>
 	public App()
 	{
-		this.InitializeComponent();
+		//TODO: InitializeComponent not being generated from XAML
+		//this.InitializeComponent();
 	}
 
 	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();

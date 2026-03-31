@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Groups tasks by execution pattern for optimized scheduling.
@@ -243,7 +237,7 @@ public class TaskGrouper
                 {
                     var dependentList = graph.TaskToDependents.TryGetValue(task, out var deps)
                         ? deps.ToList()
-                        : new List<string> { task };
+                        : [task];
 
                     groups.Add(new TaskExecutionGroup
                     {

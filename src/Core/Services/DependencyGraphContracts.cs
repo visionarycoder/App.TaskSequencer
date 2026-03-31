@@ -1,6 +1,4 @@
-using App.TaskSequencer.Domain.Models;
-
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Represents a directed acyclic graph (DAG) of task dependencies.

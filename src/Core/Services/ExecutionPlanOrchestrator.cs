@@ -1,12 +1,6 @@
-using App.TaskSequencer.Domain.Models;
-using App.TaskSequencer.BusinessLogic.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Core.Models;
 
-namespace App.TaskSequencer.Orchestration;
+namespace Core.Services;
 
 /// <summary>
 /// Orchestrates the complete execution planning workflow (Phases 2-5).

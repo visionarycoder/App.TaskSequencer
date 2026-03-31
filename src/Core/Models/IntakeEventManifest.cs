@@ -1,6 +1,6 @@
 using CsvHelper.Configuration.Attributes;
 
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Raw manifest record from Intake Event (Availability Window) CSV.

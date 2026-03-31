@@ -1,6 +1,6 @@
-using App.TaskSequencer.Domain.Models;
+using Core.Models;
 
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Generates ExecutionEventDefinition instances from TaskDefinitionEnhanced.

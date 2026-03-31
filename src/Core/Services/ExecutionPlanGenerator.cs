@@ -1,9 +1,6 @@
-using App.TaskSequencer.Domain.Foundation;
-using App.TaskSequencer.Domain.Models;
-using App.TaskSequencer.BusinessLogic.Services;
-using App.TaskSequencer.Infrastructure.Persistence;
+using Core.Models;
 
-namespace App.TaskSequencer.Orchestration.Generators;
+namespace Core.Services;
 
 /// <summary>
 /// Generates the complete execution plan from raw manifests.

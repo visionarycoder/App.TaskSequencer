@@ -1,13 +1,7 @@
-using App.TaskSequencer.Domain.Foundation;
-using App.TaskSequencer.Domain.Models;
-using App.TaskSequencer.Orchestration.Orleans.Grains;
-using App.TaskSequencer.BusinessLogic.Services;
-using App.TaskSequencer.Infrastructure.Persistence;
-using Orleans;
-using Orleans.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using Core.Models;
+using Core.Orleans.Grains;
 
-namespace App.TaskSequencer.Orchestration.Generators;
+namespace Core.Services;
 
 /// <summary>
 /// Orleans-based execution plan generator using iterative grain-based calculation.

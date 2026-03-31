@@ -29,7 +29,7 @@ metadata:
 ### Start Here
 - **Main Instructions** → [`docs/instructions/index.md`](../docs/instructions/index.md)
 - **Navigation Guide** → [`docs/instructions/readme.md`](../docs/instructions/readme.md)
-- **Architecture Overview** → [`docs/instructions/architecture/README.md`](../docs/instructions/architecture/README.md)
+- **Architecture Overview** → [`docs/instructions/architecture/readme.md`](../docs/instructions/architecture/readme.md)
 
 ### Critical Rules (Must Know)
 1. **Async Methods** - [`docs/instructions/standards/02-async-requirements.md`](../docs/instructions/standards/02-async-requirements.md)
@@ -45,7 +45,7 @@ metadata:
 
 ### Reference Documents
 - **Complete Index** → [`docs/instructions/index.md`](../docs/instructions/index.md)
-- **Business Requirements** → [`docs/instructions/business/README.md`](../docs/instructions/business/README.md)
+- **Business Requirements** → [`docs/instructions/business/readme.md`](../docs/instructions/business/readme.md)
 - **Phase 2 Summary** → [`docs/instructions/PHASE_2_IMPLEMENTATION_SUMMARY.md`](../docs/instructions/PHASE_2_IMPLEMENTATION_SUMMARY.md)
 - **Test Data** → [`docs/data/`](../docs/data/)
 
@@ -92,8 +92,8 @@ cat docs/instructions/index.md
 cat docs/instructions/readme.md
 
 # View specific areas
-cat docs/instructions/architecture/README.md
-cat docs/instructions/business/README.md
+cat docs/instructions/architecture/readme.md
+cat docs/instructions/business/readme.md
 
 # Specific patterns
 cat docs/instructions/patterns/01-ddd.md

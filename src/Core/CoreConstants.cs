@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace App.TaskSequencer.Infrastructure;
+namespace Core;
 
 public class GlobalConstants
 {

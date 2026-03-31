@@ -5,7 +5,7 @@
     x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.SettingsPage"
     Title="Settings - Load Execution Plan">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="20" Spacing="15">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20" ColumnSpacing="15" RowSpacing="15">
         <!-- Header -->
         <VerticalStackLayout Spacing="10">
             <Label Text="Task Sequencer - Execution Planning" FontSize="24" FontAttributes="Bold" />
@@ -132,7 +132,7 @@
                 TextColor="White"
                 WidthRequest="150" />
             <Button 
-                Text="Load & Plan" 
+                Text="Load &amp; Plan" 
                 Command="{Binding LoadAndPlanCommand}"
                 BackgroundColor="#34C759" 
                 TextColor="White"

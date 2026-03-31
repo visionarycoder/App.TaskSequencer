@@ -1,4 +1,4 @@
-namespace App.TaskSequencer.Domain.Foundation;
+namespace Core.Models;
 
 /// <summary>
 /// Represents a time of day without date (HH:mm:ss).

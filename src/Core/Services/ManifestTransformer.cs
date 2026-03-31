@@ -1,8 +1,7 @@
-using App.TaskSequencer.Domain.Foundation;
-using App.TaskSequencer.Domain.Models;
-using UtilsHelper = App.TaskSequencer.Infrastructure.Utils.Utils;
+using Core.Models;
+using UtilsHelper = Core.Ifx.Utils;
 
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Transforms raw CSV manifest records into strongly-typed domain models.

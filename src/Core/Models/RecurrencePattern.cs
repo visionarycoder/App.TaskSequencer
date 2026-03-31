@@ -1,4 +1,4 @@
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Defines the recurrence frequency for repeated events.

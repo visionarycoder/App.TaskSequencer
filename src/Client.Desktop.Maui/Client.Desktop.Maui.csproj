@@ -54,8 +54,6 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="CommunityToolkit.Diagnostics" />
 		<PackageReference Include="Microsoft.Orleans.Client" />
-		<PackageReference Include="Serilog" />
-		<PackageReference Include="Serilog.Sinks.Debug" />
 	</ItemGroup>
 
 	<ItemGroup>

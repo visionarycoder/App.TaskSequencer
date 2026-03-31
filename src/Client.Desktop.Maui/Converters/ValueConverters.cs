@@ -1,5 +1,7 @@
 namespace App.TaskSequencer.Client.Desktop.Maui.Converters;
 
+using System.Globalization;
+
 /// <summary>
 /// Converts integer to boolean (0 = false, non-zero = true)
 /// </summary>

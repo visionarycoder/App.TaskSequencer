@@ -1,6 +1,6 @@
 using CsvHelper.Configuration.Attributes;
 
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Raw manifest record from Execution Duration History CSV.

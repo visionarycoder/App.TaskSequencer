@@ -66,7 +66,7 @@ metadata:
   - Technology stack overview
   - Quick navigation to detailed docs
 
-- [`business/README.md`](business/README.md) - Navigation & concept overview
+- [`business/readme.md`](business/readme.md) - Navigation & concept overview
 
 ---
 
@@ -96,7 +96,7 @@ metadata:
   - SOLID principles
   - Dependency injection patterns
 
-- [`standards/README.md`](standards/README.md) - Navigation with critical rules reference table
+- [`standards/readme.md`](standards/readme.md) - Navigation with critical rules reference table
 
 ---
 
@@ -123,7 +123,7 @@ metadata:
   - Test data builders
   - Mock strategies
 
-- [`patterns/README.md`](patterns/README.md) - Pattern selection guide & task-based navigation
+- [`patterns/readme.md`](patterns/readme.md) - Pattern selection guide & task-based navigation
 
 ---
 
@@ -131,7 +131,7 @@ metadata:
 
 These legacy files remain in `docs/` for reference:
 
-- `README.md` - Original comprehensive standards document (50 KB, 31 sections)
+- `readme.md` - Original comprehensive standards document (50 KB, 31 sections)
 - `CHANGELOG.md` - Version history and changes
 - `summary.md` - Project overview
 - `completion_report.md` - Project completion summary
@@ -201,8 +201,8 @@ These legacy files remain in `docs/` for reference:
 4. Consult [`standards/03-code-quality-architecture.md`](standards/03-code-quality-architecture.md) (value objects & SOLID)
 
 ### "I'm optimizing performance" (Developer)
-1. Reference original `README.md` - Section 19 (Performance)
-2. Reference original `README.md` - Section 20 (.NET 10 Gotchas)
+1. Reference original `readme.md` - Section 19 (Performance)
+2. Reference original `readme.md` - Section 20 (.NET 10 Gotchas)
 
 ### "I'm reviewing code" (Code Reviewer)
 1. Check against [`standards/03-code-quality-architecture.md`](standards/03-code-quality-architecture.md) metrics (30 line max, cyclomatic complexity ≤10)
@@ -263,24 +263,24 @@ Violations are **BREAKING**.
 ```
 docs/
 ├── business/                    # 🏢 WHAT WE'RE BUILDING
-│   ├── README.md               # Navigation & concept overview
+│   ├── readme.md               # Navigation & concept overview
 │   ├── 01-architecture-requirements.md    # ⭐ Start here (CSV specs, domain context)
 │   └── 02-execution-sequencing-pipeline.md # Orleans implementation spec
 │
 ├── standards/                   # 💻 HOW TO WRITE CODE
-│   ├── README.md               # Navigation with critical rules
+│   ├── readme.md               # Navigation with critical rules
 │   ├── 01-coding-standards.md  # Naming, formatting, C# 14+ features
 │   ├── 02-async-requirements.md # 🔴 MANDATORY: Async/cancellation rules
 │   └── 03-code-quality-architecture.md # Metrics, DDD, SOLID, primitive obsession
 │
 ├── patterns/                    # 🎨 DESIGN PATTERNS
-│   ├── README.md               # Pattern selection guide
+│   ├── readme.md               # Pattern selection guide
 │   ├── 01-ddd.md               # Repository, Specification, Domain Events
 │   ├── 02-validation.md        # Validation strategies & error handling
 │   └── 03-testing.md           # Unit & integration testing patterns
 │
 ├── index.md                     # This file (navigation guide)
-├── README.md                    # Original 31-section comprehensive guide (legacy)
+├── readme.md                    # Original 31-section comprehensive guide (legacy)
 ├── CHANGELOG.md                 # Version history
 ├── summary.md                   # Project overview
 ├── quick_start.md              # New contributor guide
@@ -358,7 +358,7 @@ A: All rules require consistency. Discuss with the team; update applies project-
 **Q: How often are these updated?**  
 A: Check `CHANGELOG.md` for history. Quarterly review recommended as .NET evolves (new versions, new features).
 
-**Q: What about the original `README.md` (50 KB)?**  
+**Q: What about the original `readme.md` (50 KB)?**  
 A: It remains in `docs/` for reference but is superseded by the organized standards/ section. Prefer the organized files for new work.
 
 **Q: Are these rules enforced by tooling?**  

@@ -13,7 +13,7 @@ public partial class TimelineViewModel : ObservableObject
     private readonly ExecutionPlanService ExecutionPlanService;
 
     [ObservableProperty]
-    private ObservableCollection<ExecutionTaskDisplay> executionTasks = new();
+    private ObservableCollection<ExecutionTaskDisplay> executionTasks = [];
 
     [ObservableProperty]
     private DateTime timelineStart;

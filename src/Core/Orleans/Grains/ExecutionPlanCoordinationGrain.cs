@@ -1,11 +1,6 @@
-using App.TaskSequencer.Domain.Models;
-using Orleans;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Core.Models;
 
-namespace App.TaskSequencer.Orchestration.Orleans.Grains;
+namespace Core.Orleans.Grains;
 
 /// <summary>
 /// Grain interface for high-level execution plan coordination and management.
@@ -107,9 +102,9 @@ public record CoordinationStatus
 /// </summary>
 public class ExecutionPlanCoordinationGrain : Grain, IExecutionPlanCoordinationGrain
 {
-    private Dictionary<string, ExecutionPlan> executionPlans = new();
-    private Dictionary<string, ExecutionInstanceEnhanced> taskExecutionStatus = new();
-    private Dictionary<string, IExecutionPlanCoordinatorGrain> coordinatorGrains = new();
+    private Dictionary<string, ExecutionPlan> executionPlans = [];
+    private Dictionary<string, ExecutionInstanceEnhanced> taskExecutionStatus = [];
+    private Dictionary<string, IExecutionPlanCoordinatorGrain> coordinatorGrains = [];
     private DateTime planningPeriodStart;
     private DateTime planningPeriodEnd;
     private int iterationCount = 0;

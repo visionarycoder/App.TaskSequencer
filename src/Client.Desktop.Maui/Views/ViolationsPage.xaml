@@ -5,7 +5,7 @@
     x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.ViolationsPage"
     Title="Deadline Violations">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" Spacing="10">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" Margin="10" RowSpacing="10">
         <!-- Header -->
         <VerticalStackLayout Spacing="5">
             <Label Text="Deadline Violations Report" FontSize="24" FontAttributes="Bold" />

@@ -1,7 +1,6 @@
-using App.TaskSequencer.Domain.Models;
-using Orleans;
+using Core.Models;
 
-namespace App.TaskSequencer.Orchestration.Orleans.Grains;
+namespace Core.Orleans.Grains;
 
 /// <summary>
 /// Implementation of execution task grain for iterative time slot calculation.
@@ -175,12 +174,12 @@ public class ExecutionTaskGrain : Grain, IExecutionTaskGrain
 /// </summary>
 public class ExecutionPlanCoordinatorGrain : Grain, IExecutionPlanCoordinatorGrain
 {
-    private Dictionary<string, IExecutionTaskGrain> taskGrains = new();
+    private Dictionary<string, IExecutionTaskGrain> taskGrains = [];
     private DateTime periodStartDate;
     private IReadOnlyList<ExecutionInstanceEnhanced>? currentPlan;
     private int iterationCount;
     private DateTime refinementStartTime;
-    private List<string> conflictingTasks = new();
+    private List<string> conflictingTasks = [];
     private const int MaxIterations = 100; // Prevent infinite loops
 
     public async Task<ExecutionPlan> CalculateExecutionPlanAsync(

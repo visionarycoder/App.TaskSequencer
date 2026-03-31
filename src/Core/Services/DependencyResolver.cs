@@ -1,7 +1,6 @@
-using App.TaskSequencer.Domain.Foundation;
-using App.TaskSequencer.Domain.Models;
+using Core.Models;
 
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Resolves dependencies for execution events and adjusts start times based on prerequisite completion.

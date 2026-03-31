@@ -1,7 +1,6 @@
-using App.TaskSequencer.Domain.Models;
-using Orleans;
+using Core.Models;
 
-namespace App.TaskSequencer.Orchestration.Orleans.Grains;
+namespace Core.Orleans.Grains;
 
 /// <summary>
 /// Grain interface for calculating and refining execution instance time slots.

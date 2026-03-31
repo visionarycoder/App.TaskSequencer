@@ -1,11 +1,6 @@
-using App.TaskSequencer.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Core.Models;
 
-namespace App.TaskSequencer.BusinessLogic.Services;
+namespace Core.Services;
 
 /// <summary>
 /// Analyzes criticality of tasks using forward/backward pass algorithms.

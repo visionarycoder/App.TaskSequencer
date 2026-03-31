@@ -5,7 +5,7 @@
     x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.TimelinePage"
     Title="Execution Timeline">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" Spacing="10">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" Margin="10" RowSpacing="10">
         <!-- Header -->
         <VerticalStackLayout Spacing="5">
             <Label Text="Gantt Chart - Task Execution Timeline" FontSize="24" FontAttributes="Bold" />
@@ -88,11 +88,6 @@
                                             Color="{Binding ., Converter={StaticResource TaskColorConverter}}" />
                                     </HorizontalStackLayout>
                                 </Frame>
-
-                                <!-- Details Tooltip -->
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectTaskCommand}" CommandParameter="{Binding .}" />
-                                </Frame.GestureRecognizers>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

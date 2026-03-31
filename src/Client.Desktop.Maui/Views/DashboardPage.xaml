@@ -5,7 +5,7 @@
     x:Class="App.TaskSequencer.Client.Desktop.Maui.Views.DashboardPage"
     Title="Dashboard">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="20" Spacing="15">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20" ColumnSpacing="15" RowSpacing="15">
         <!-- Header -->
         <VerticalStackLayout Spacing="5">
             <Label Text="Execution Plan Dashboard" FontSize="24" FontAttributes="Bold" />

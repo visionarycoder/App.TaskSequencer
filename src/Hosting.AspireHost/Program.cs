@@ -12,14 +12,23 @@ var orleansSilo = builder
     .WithEnvironment("DOTNET_ENVIRONMENT", "Development");
 
 // Add Console Client service that depends on Orleans
+//TODO: DependsOn method not available in Aspire.Hosting API
+//var consoleClient = builder
+//    .AddExecutable(
+//        "console-client",
+//        "dotnet",
+//        workingDirectory: "../Client.Desktop.Console",
+//        args: new[] { "run" })
+//    .WithEnvironment("DOTNET_ENVIRONMENT", "Development")
+//    .DependsOn(orleansSilo);
+
 var consoleClient = builder
     .AddExecutable(
         "console-client",
         "dotnet",
         workingDirectory: "../Client.Desktop.Console",
         args: new[] { "run" })
-    .WithEnvironment("DOTNET_ENVIRONMENT", "Development")
-    .DependsOn(orleansSilo);
+    .WithEnvironment("DOTNET_ENVIRONMENT", "Development");
 
 // Build and run
 await builder.Build().RunAsync();

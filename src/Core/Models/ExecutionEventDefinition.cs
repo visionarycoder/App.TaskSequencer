@@ -1,7 +1,4 @@
-using App.TaskSequencer.Domain.Foundation;
-using App.TaskSequencer.Domain.Models;
-
-namespace App.TaskSequencer.Domain.Models;
+namespace Core.Models;
 
 /// <summary>
 /// Represents a single scheduled execution event for a task.

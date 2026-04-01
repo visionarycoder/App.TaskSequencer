@@ -23,6 +23,13 @@
     <Project Path="src/Hosting.OrleansHost/Hosting.OrleansHost.csproj" Id="f3c541db-a038-4484-95d6-4b9a26760c82" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/integration/">
+    <Project Path="tests/integration/Core.IntegrationTests/Core.IntegrationTests.csproj" />
+    <Project Path="tests/integration/Core.Orleans.Distributed/Core.Orleans.Distributed.csproj" />
+    <Project Path="tests/integration/Core.Orleans.Monitoring/Core.Orleans.Monitoring.csproj" />
+    <Project Path="tests/integration/Core.Orleans.Performance/Core.Orleans.Performance.csproj" />
+    <Project Path="tests/integration/Core.Orleans.TestHost/Core.Orleans.TestHost.csproj" />
+  </Folder>
   <Folder Name="/tests/unit/">
     <Project Path="tests/unit/Core.UnitTests/Core.UnitTests.csproj" />
   </Folder>

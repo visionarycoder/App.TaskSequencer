@@ -1,0 +1,99 @@
+﻿Sequence,Interface ID,Internal Cycle Type,Internal Cycle Detail,Internal  Delivery Time,Internal Delivery Time Detail,External Cycle Type,External Cycle Day,External Batch Start Time,External Batch End Time,External Delivery Time Detail,Hard Dependency Description
+41,2010,Montlhy,"Twice monthly, Payroll Calendar",TBD,Day 4,Nightly,OnDemand,AdHoc,AdHoc,,2104
+42,2010 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2010
+35,2012,Monthly,"Twice monthly, Payroll Calendar",3:30pm,Day 3,N/A,N/A,N/A,N/A,,N/A
+56,2013,Daily,Sun-Sat,1:15am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+69,2014,Daily,Sun-Sat,7:00am,between 7am and 8am,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+70,2015,Daily,Sun-Sat,7:00am,between 7am and 8am,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+76,2016,Daily,Mon-Fri,4:00am,,OnDemand,OnDemand,AdHoc,AdHoc,,2109 (834)
+60,2017,Daily,Sun-Sat,11:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,2018
+61,2018,Daily,Sun-Sat,11:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+62,2019,Daily,Sun-Sat,11:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,2017
+59,2020,Daily,Mon-Fri,5:30am,Between 5:30am and 7:00am,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+83,2040,Daily,Mon-Fri,4:00am,,N/A,N/A,N/A,N/A,,2109 (834)
+48,2024,Daily,Sun-Sat,6:30pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+49,2025,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,2024
+78,2026,Daily,Mon-Fri,7:45pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+84,2040 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2040
+63,2028,Daily,Sun-Sat,6:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+79,2029,Daily,Mon-Fri,7:45pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+64,2030,Daily,Sun-Sat,6:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+53,2031,Daily,Mon-Fri,11:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+47,2036,Daily,Mon-Fri,2:00pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+46,2037,Monthly,1st and 15th,TBD,,OnDemand,OnDemand,AdHoc,AdHoc,,2027
+54,2038,Daily,Mon-Fri,11:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+55,2039,Monthly,8th day,7:00pm,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,N/A
+37,2104,Montlhy,"Twice monthly, Payroll Calendar",TBD,Day 3,Payroll,Day 3,3:00pm,3:00am,"Day 3, every 30 minute for 12 hours",2012
+11,2041,Daily,Sat-Sun,6:30pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+12,2042,Daily,Sun-Sat,6:30pm,,Nightly,Mon-Sun,10:00pm,6:00am,,2041
+13,2044,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,N/A
+14,2045,Monthly,5th Day,3:30pm,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2042
+30,2048,Monthly,Monthly,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,N/A
+24,2049,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,N/A
+66,2050,Montlhy,Monthly,11:00pm,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,N/A
+67,2051,Daily,Mon-Fri,7:45pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+68,2052,Daily,Mon-Fri,4:00am,,N/A,N/A,N/A,N/A,,2051
+32,2056,Daily,Mon-Fri,4:00am,,OnDemand,OnDemand,AdHoc,AdHoc,,2091
+15,2057,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2045
+16,2058,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2057
+17,2059,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2058
+18,2060,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2059
+19,2061,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2060
+20,2062,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2061
+21,2063,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2062
+22,2064,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2063
+23,2065,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2064
+25,2066,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2049
+26,2067,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2066
+27,2068,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2067
+28,2069,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2068
+29,2070,Monthly,5th Day,7:00am,,Weekly,Sunday,10:00pm,6:00am,w/ Nightly Batch,2069
+86,2071,,Mon-Fri,7:30pm,,OnDemand,OnDemand,AdHoc,AdHoc,,2109 (834)
+33,2081,Daily,Sun-Sat,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,N/A
+8,2082,Daily,Sun-Sat,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,2083
+10,2083,Monthly,Monthly,TBD,Day 1,N/A,N/A,N/A,N/A,,2012
+50,2086,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,N/A
+31,2091,Daily,Mon-Fri,6:30pm,,Nightly,Mon-Sun,10:00pm,6:00am,,2081
+80,2102,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,N/A
+81,2103,Adhoc,OnDemand,Adhoc,Adhoc,N/A,N/A,N/A,N/A,,N/A
+1,2106,Daily,Mon-Fri,5:45am,,Daytime,Mon-Fri,6:00am,12:00pm,,N/A
+2,2106 (835) IDL DT,N/A,N/A,5:45am,N/A,N/A,N/A,N/A,N/A,,2106
+9,2112,Daily,Everyday,7:15am,,N/A,N/A,N/A,N/A,,N/A
+51,2113,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,2084
+85,2114,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,N/A
+82,2118,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,N/A
+65,2119,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,N/A
+77,2120,Adhoc,OnDemand,Adhoc,OnDemand,N/A,N/A,N/A,N/A,,N/A
+52,2122,Daily,Mon-Fri,5:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+94,2124,,OnDemand,Adhoc,Adhoc,N/A,N/A,N/A,N/A,,N/A
+3,2126,Daily,Mon-Fri,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,
+4,2127,Daily,Mon-Fri,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,
+5,2129,Daily,Mon-Fri,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,
+6,2130,Daily,Mon-Fri,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,
+7,2131,Daily,Mon-Fri,10:05am,Every 4 hours,N/A,N/A,N/A,N/A,,
+91,2136,Monthly,Monthly,Varies,"Last Day of Month, post T4 Processing",OnDemand,OnDemand,AdHoc,AdHoc,,
+#N/A,2107,Daily,Mon-Fri,6:00am,,Nightly,Mon-Sun,10:00pm,6:00am,,"2014, 2015"
+72,2107 (836) IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2107
+95,2009 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,N/A
+#N/A,2108,Daily,Mon-Fri,5:30am,,Nightly,Mon-Sun,10:00pm,6:00am,,"2014, 2015"
+97,2108 (832) IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2108
+,2109 (834) IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2109 (834)
+#N/A,2109,Daily,Mon-Fri,7:00pm,,Nightly,Mon-Sun,10:00pm,6:00am,,N/A
+58,2137,Daily,Mon-Fri,6:00am,Every 60 minutes,Daytime,Mon-Fri,6:00am,10:00pm,Every 60 minutes,TRAINS4
+57,2137 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2137
+96,2140,,Mon-Fri,4:00am,Post T4 processing AFRS inbound interface for payments.,OnDemand,OnDemand,AdHoc,AdHoc,,2109 (834)
+98,2140 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2140
+87,2093A,Daily,Mon-Fri,6:00am,Every 15 minutes,Daytime,Mon-Sun,6:00am,10:00pm,Every 15 Minutes,N/A
+#N/A,2093 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2093
+88,2093B,Daily,Mon-Fri,6:00am,Every 15 minutes,Daytime,Mon-Sun,6:00am,10:00pm,Every 15 Minutes,2093A
+38,2104 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2104
+43,2105,Montlhy,"Twice monthly, Payroll Calendar",TBD,Day 5,Nightly,OnDemand,AdHoc,AdHoc,,2010
+44,2105 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2105
+34,2011,Daily,Everyday,7:15am,,N/A,N/A,N/A,N/A,,N/A
+36,2011 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2012
+39,2023,Montlhy,"Twice monthly, Payroll Calendar",TBD,Day 4,Payroll,Day 4,2:00am,2:00pm,"Day 4, every 30 minutes for 12 hours",2011
+40,2023 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2023
+45,2027,Montlhy,"Twice monthly, Payroll Calendar",TBD,Day 5,Nightly,OnDemand,AdHoc,AdHoc,,"2010, 2105"
+93,2027 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2027
+89,2092 IDL DT,N/A,Requires Workday,Requires Workday,Requires Workday,Requires Workday,Requires Workday,Requires Workday,Requires Workday,,2092
+92,2115 IDL DT,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,,2115

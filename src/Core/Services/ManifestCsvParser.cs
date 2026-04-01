@@ -77,6 +77,28 @@ public class ManifestCsvParser
     }
 
     /// <summary>
+    /// Parses Master Sequence CSV file.
+    /// </summary>
+    public async Task<List<MasterSequenceManifest>> ParseMasterSequenceCsvAsync(string filePath)
+    {
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"Master sequence file not found: {filePath}");
+
+        using var reader = new StreamReader(filePath);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        var records = csv.GetRecordsAsync<MasterSequenceManifest>();
+        var list = new List<MasterSequenceManifest>();
+
+        await foreach (var record in records)
+        {
+            list.Add(record);
+        }
+
+        return list;
+    }
+
+    /// <summary>
     /// Parses all three CSV files synchronously (convenience method).
     /// </summary>
     public (List<TaskDefinitionManifest> Tasks, List<IntakeEventManifest> IntakeEvents, List<ExecutionDurationManifest> Durations)

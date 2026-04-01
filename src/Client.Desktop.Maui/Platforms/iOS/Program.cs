@@ -1,7 +1,4 @@
-﻿using ObjCRuntime;
-using UIKit;
-
-namespace App.TaskSequencer.Client.Desktop.Maui;
+﻿namespace App.TaskSequencer.Client.Desktop.Maui.Platforms.iOS;
 
 public class Program
 {

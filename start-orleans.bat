@@ -16,7 +16,7 @@ echo.
 echo Starting Orleans silo on localhost:11111...
 echo.
 
-cd /d "%SCRIPT_DIR%src\App.TaskSequencer.OrleansHost"
+cd /d "%SCRIPT_DIR%src\Hosting.OrleansHost"
 dotnet run
 
 echo.

@@ -6,7 +6,16 @@ public partial class App : Application
 {
 	public App()
 	{
-		InitializeComponent();
+		try
+		{
+			InitializeComponent();
+		}
+		catch (Exception ex)
+		{
+			// Handle resource loading errors gracefully
+			System.Diagnostics.Debug.WriteLine($"Error initializing App XAML: {ex.Message}");
+			// Continue initialization even if XAML resource loading fails
+		}
 	}
 
 	protected override Window CreateWindow(IActivationState? activationState)

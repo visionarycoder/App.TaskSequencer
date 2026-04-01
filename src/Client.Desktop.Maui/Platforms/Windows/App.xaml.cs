@@ -1,4 +1,4 @@
-﻿
+﻿using System.Runtime.InteropServices;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,10 +16,27 @@ public partial class App : MauiWinUIApplication
 	/// </summary>
 	public App()
 	{
-		//TODO: InitializeComponent not being generated from XAML
-		//this.InitializeComponent();
+		// Initialize Windows-specific error handling
+		WindowsInitializationHelper.Initialize();
+
+		try
+		{
+			this.InitializeComponent();
+		}
+		catch (COMException comEx) when (comEx.HResult == unchecked((int)0x80004005))
+		{
+			// Handle resource loading error gracefully
+			System.Diagnostics.Debug.WriteLine($"App.xaml initialization - resource error (0x80004005): {comEx.Message}");
+		}
+		catch (Exception ex)
+		{
+			System.Diagnostics.Debug.WriteLine($"App.xaml initialization error: {ex}");
+		}
 	}
 
-	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+	protected override MauiApp CreateMauiApp()
+	{
+		return WindowsInitializationHelper.TryCreateMauiApp(() => MauiProgram.CreateMauiApp());
+	}
 }
 

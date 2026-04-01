@@ -1,20 +1,20 @@
 using Core.Services;
 using Orleans;
 
-namespace App.TaskSequencer.Client.Desktop.Maui.Services;
+namespace Clinet.Desktop.WinUI.Services;
 
 /// <summary>
 /// Service for communicating with Orleans grains and coordinating execution planning.
-/// Bridges the MAUI UI with the backend Orleans execution coordination system.
-/// TODO: This service requires refactoring to match the actual domain model types and Orleans APIs
+/// Bridges the WinUI UI with the backend Orleans execution coordination system.
 /// </summary>
 public class ExecutionPlanService
 {
-    private readonly IClusterClient? GrainClient;
+    // Orleans client would be injected here when backend is ready
+    // private readonly IClusterClient? GrainClient;
 
-    public ExecutionPlanService(IClusterClient? grainClient = null)
+    public ExecutionPlanService()
     {
-        GrainClient = grainClient;
+        // GrainClient = grainClient;
     }
 
     /// <summary>

@@ -24,7 +24,7 @@ REM Start Aspire.AppHost
 echo.
 echo Starting Aspire.AppHost...
 echo.
-start "Aspire.AppHost" cmd /k "cd /d "%SCRIPT_DIR%src\Aspire.AppHost" && dotnet run"
+start "Aspire.AppHost" cmd /k "cd /d "%SCRIPT_DIR%src\Hosting.AspireHost" && dotnet run"
 
 REM Give Aspire time to start
 timeout /t 3 /nobreak

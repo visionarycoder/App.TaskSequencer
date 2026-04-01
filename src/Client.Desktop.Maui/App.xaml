@@ -5,13 +5,9 @@
              xmlns:converters="clr-namespace:App.TaskSequencer.Client.Desktop.Maui.Converters"
              x:Class="App.TaskSequencer.Client.Desktop.Maui.App">
     <Application.Resources>
+        <!-- Simplified resource dictionary - avoiding external resource loading that triggers COM errors -->
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
-                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
-            <!-- Value Converters -->
+            <!-- Value Converters - defined inline to avoid file loading issues -->
             <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <converters:InvertedIntToBoolConverter x:Key="InvertedIntToBoolConverter" />

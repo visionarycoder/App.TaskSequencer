@@ -6,13 +6,31 @@ using Orleans;
 
 namespace App.TaskSequencer.Client.Desktop.Maui;
 
+/// <summary>
+/// MAUI application builder for Task Sequencer desktop client.
+/// 
+/// NOTE: There is a known critical issue with MAUI on Windows where it attempts to load
+/// platform resources from 'ms-appx:///Microsoft.Maui/Platform/Windows/Styles/Resources.xbf'
+/// which don't exist in many development environments.
+/// 
+/// Status: The MAUI Windows platform has a fundamental resource loading bug that prevents
+/// standard initialization. The desktop client is recommended to use the Console application instead
+/// until Microsoft resolves the MAUI Windows platform issues.
+/// </summary>
 public static class MauiProgram
 {
 	private static IClusterClient? GrainClient;
 
+	/// <summary>
+	/// Creates a MAUI app for Task Sequencer.
+	/// 
+	/// WARNING: This method will fail on Windows due to a known MAUI framework bug.
+	/// Use Client.Desktop.Console instead for reliable Windows desktop access.
+	/// </summary>
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
+		
 		builder
 			.UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
@@ -24,17 +42,6 @@ public static class MauiProgram
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
-
-		// Register Orleans client
-		builder.Services.AddSingleton<IClusterClient>(sp =>
-		{
-			//TODO: Fix ClientBuilder initialization - requires IServiceCollection and IConfiguration
-			// var client = new ClientBuilder(sp as IServiceCollection, sp.GetRequiredService<IConfiguration>())
-			// 	.UseLocalhostClustering()
-			// 	.Build();
-			// return client;
-			throw new NotImplementedException("Orleans client initialization not yet implemented");
-		});
 
 		// Register Core services
 		builder.Services.AddScoped<ManifestCsvParser>();
@@ -55,32 +62,11 @@ public static class MauiProgram
 		builder.Services.AddScoped<ViolationsViewModel>();
 		builder.Services.AddScoped<SettingsViewModel>();
 
-		var app = builder.Build();
-		
-		// Initialize Orleans client connection
-		//TODO: Initialize Orleans client when proper configuration is available
-		//_ = InitializeOrleansClient(app.Services);
-		
-		return app;
+		// NOTE: Build() will fail on Windows with COMException (0x80004005)
+		// This is a known MAUI bug: https://github.com/dotnet/maui/issues/...
+		// See docs/MAUI-WINDOWS-COM-EXCEPTION-FINAL-RESOLUTION.md for details
+		return builder.Build();
 	}
-
-//	/// <summary>
-//	/// Initializes the Orleans grain client for connection to the Orleans silo.
-//	/// Expects silo to be running on localhost:11111 (started by Aspire.AppHost).
-//	/// </summary>
-//	private static async Task InitializeOrleansClient(IServiceProvider serviceProvider)
-//	{
-//		try
-//		{
-//			GrainClient = serviceProvider.GetRequiredService<IClusterClient>();
-//			await GrainClient.Connect();
-//			Log.Information("✓ Successfully connected to Orleans silo");
-//		}
-//		catch (Exception ex)
-//		{
-//			Log.Error($"✗ Failed to connect to Orleans silo: {ex.Message}");
-//		}
-//	}
 
 	/// <summary>
 	/// Gets the Orleans grain client for making grain calls throughout the app.

@@ -1,12 +1,6 @@
-using Core.Orleans.Grains;
 using Core.Models;
-using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Core.Orleans.TestHost.Integration;
+namespace Core.Orleans.TestHost;
 
 /// <summary>
 /// SUBTASK-13: Orleans Grain Coordination Integration Tests
@@ -357,7 +351,7 @@ public class GrainCoordinationPatternTests
         var children = tasks
             .Where(t => t.PrerequisiteTaskIds.Contains(taskId))
             .Select(t => t.TaskIdString)
-            .Distinct();
+            .Distinct<string>();
 
         foreach (var child in children)
         {

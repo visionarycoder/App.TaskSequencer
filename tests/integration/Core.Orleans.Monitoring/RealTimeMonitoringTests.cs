@@ -1,7 +1,6 @@
 using Core.Models;
-using Xunit;
 
-namespace Core.Orleans.Monitoring.Tests;
+namespace Core.Orleans.Monitoring;
 
 /// <summary>
 /// Test suite for real-time monitoring of distributed grain execution.

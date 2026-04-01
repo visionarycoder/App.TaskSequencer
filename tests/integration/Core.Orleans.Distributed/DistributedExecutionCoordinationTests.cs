@@ -1,7 +1,6 @@
 using Core.Models;
-using Xunit;
 
-namespace Core.Orleans.Distributed.Tests;
+namespace Core.Orleans.Distributed;
 
 /// <summary>
 /// Test suite for distributed execution coordination across multiple grains.
@@ -707,14 +706,14 @@ public class DistributedOrchestrator
             IncrementStart: instances.Any() ? instances.Min(i => i.ScheduledStartTime) : DateTime.Now,
             IncrementEnd: instances.Any() ? instances.Max(i => i.PlannedCompletionTime) : DateTime.Now,
             Tasks: instances,
-            TaskChain: instances.Select(i => i.TaskIdString).ToList(),
+            TaskChain: instances.Select(i => i.TaskIdString).ToList<string>(),
             TotalValidTasks: validTasks,
             TotalInvalidTasks: invalidTasks,
             CriticalPathCompletion: instances.Any() ? 
                 instances.OrderByDescending(i => i.PlannedCompletionTime).First().PlannedCompletionTime :
                 null,
             DeadlineMisses: instances.Where(i => i.RequiredEndTime.HasValue && i.PlannedCompletionTime > i.RequiredEndTime.Value)
-                .Select(i => i.TaskIdString).ToList()
+                .Select(i => i.TaskIdString).ToList<string>()
         );
     }
 
@@ -744,11 +743,11 @@ public class DistributedOrchestrator
             IncrementStart: instances.First().ScheduledStartTime,
             IncrementEnd: instances.Last().PlannedCompletionTime,
             Tasks: instances,
-            TaskChain: instances.Select(i => i.TaskIdString).ToList(),
+            TaskChain: instances.Select(i => i.TaskIdString).ToList<string>(),
             TotalValidTasks: validTasks,
             TotalInvalidTasks: invalidTasks,
             CriticalPathCompletion: instances.Last().PlannedCompletionTime,
-            DeadlineMisses: instances.Where(i => !i.IsValid).Select(i => i.TaskIdString).ToList()
+            DeadlineMisses: instances.Where(i => !i.IsValid).Select(i => i.TaskIdString).ToList<string>()
         );
     }
 
@@ -895,9 +894,9 @@ public class DistributedOrchestrator
 
         // Trace back through prerequisites
         var current = longestEnd;
-        while (current.PrerequisiteTaskIds.Any())
+        while (Enumerable.Any<string>(current.PrerequisiteTaskIds))
         {
-            var prereq = instances.FirstOrDefault(i => i.TaskIdString == current.PrerequisiteTaskIds.First());
+            var prereq = instances.FirstOrDefault(i => i.TaskIdString == Enumerable.First<string>(current.PrerequisiteTaskIds));
             if (prereq == null) break;
             path.Insert(0, prereq.TaskIdString);
             current = prereq;

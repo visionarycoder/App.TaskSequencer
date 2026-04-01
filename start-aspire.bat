@@ -22,7 +22,7 @@ echo.
 echo Starting Aspire.AppHost...
 echo.
 
-cd /d "%SCRIPT_DIR%src\Aspire.AppHost"
+cd /d "%SCRIPT_DIR%src\Hosting.AspireHost"
 dotnet run
 
 echo.

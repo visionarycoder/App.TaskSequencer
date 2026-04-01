@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
+    <RootNamespace>Client.Desktop.WinUI</RootNamespace>
+    <ImplicitUsings>Enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- WinUI -->
+    <UseWinUI>true</UseWinUI>
+    <!-- Work around XAML compiler .NET 10 issue -->
+    <DisableUIThreadAnalysis>true</DisableUIThreadAnalysis>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinUI -->
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
+
+    <!-- MVVM & Data Binding -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+
+    <!-- Dependency Injection -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+
+    <!-- Shared project reference -->
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Clinet.Desktop.WinUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Clinet.Desktop.WinUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,6 +1,4 @@
-﻿using Foundation;
-
-namespace App.TaskSequencer.Client.Desktop.Maui;
+﻿namespace App.TaskSequencer.Client.Desktop.Maui.Platforms.iOS;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

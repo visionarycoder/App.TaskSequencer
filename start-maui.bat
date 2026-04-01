@@ -24,7 +24,7 @@ echo Starting MAUI Desktop App...
 echo.
 
 cd /d "%SCRIPT_DIR%src\Client.Desktop.Maui"
-dotnet run -f net10.0-windows10.0.20348
+dotnet run
 
 echo.
 echo MAUI Desktop app stopped.

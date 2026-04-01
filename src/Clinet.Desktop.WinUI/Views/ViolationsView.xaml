@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="Clinet.Desktop.WinUI.Views.ViolationsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" RowSpacing="10">
+        <!-- Header -->
+        <StackPanel Spacing="5">
+            <TextBlock Text="Deadline Violations Report" FontSize="32" FontWeight="Bold" />
+            <TextBlock Text="{Binding StatusMessage}" FontSize="14" Foreground="Gray" />
+        </StackPanel>
+
+        <!-- Summary Statistics -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" ColumnSpacing="10" RowSpacing="10">
+            <Border BorderBrush="#FF3B30" BorderThickness="2" CornerRadius="8" Padding="10">
+                <StackPanel Spacing="3" HorizontalAlignment="Center">
+                    <TextBlock Text="Total" FontSize="11" Foreground="Gray" TextAlignment="Center" />
+                    <TextBlock Text="{Binding TotalViolations}" FontSize="20" FontWeight="Bold" Foreground="#FF3B30" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#FF3B30" BorderThickness="2" CornerRadius="8" Padding="10" Grid.Column="1">
+                <StackPanel Spacing="3" HorizontalAlignment="Center">
+                    <TextBlock Text="Critical" FontSize="11" Foreground="Gray" TextAlignment="Center" />
+                    <TextBlock Text="{Binding CriticalViolations}" FontSize="20" FontWeight="Bold" Foreground="#FF3B30" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#FF9500" BorderThickness="2" CornerRadius="8" Padding="10" Grid.Column="2">
+                <StackPanel Spacing="3" HorizontalAlignment="Center">
+                    <TextBlock Text="Moderate" FontSize="11" Foreground="Gray" TextAlignment="Center" />
+                    <TextBlock Text="{Binding ModerateViolations}" FontSize="20" FontWeight="Bold" Foreground="#FF9500" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#FFD60A" BorderThickness="2" CornerRadius="8" Padding="10" Grid.Column="3">
+                <StackPanel Spacing="3" HorizontalAlignment="Center">
+                    <TextBlock Text="Minor" FontSize="11" Foreground="Gray" TextAlignment="Center" />
+                    <TextBlock Text="{Binding MinorViolations}" FontSize="20" FontWeight="Bold" Foreground="#FFD60A" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Violations List -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="0">
+                <!-- Table Header -->
+                <Grid ColumnDefinitions="150,150,150,150,100" Padding="10" Background="#F0F0F0">
+                    <TextBlock Text="Task ID" FontSize="11" FontWeight="Bold" />
+                    <TextBlock Text="Task Name" FontSize="11" FontWeight="Bold" Grid.Column="1" />
+                    <TextBlock Text="Required End" FontSize="11" FontWeight="Bold" Grid.Column="2" />
+                    <TextBlock Text="Projected End" FontSize="11" FontWeight="Bold" Grid.Column="3" />
+                    <TextBlock Text="Overdue (min)" FontSize="11" FontWeight="Bold" Grid.Column="4" />
+                </Grid>
+
+                <!-- Violations Data -->
+                <ItemsControl ItemsSource="{Binding Violations}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="150,150,150,150,100" Padding="10" Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+                                <TextBlock Text="{Binding TaskId}" FontSize="11" />
+                                <TextBlock Text="{Binding TaskName}" FontSize="11" Grid.Column="1" />
+                                <TextBlock Text="{Binding RequiredEnd, StringFormat='{0:g}'}" FontSize="11" Grid.Column="2" />
+                                <TextBlock Text="{Binding ProjectedEnd, StringFormat='{0:g}'}" FontSize="11" Grid.Column="3" />
+                                <TextBlock Text="{Binding OverdueMinutes, StringFormat='{0:F0}'}" FontSize="11" Grid.Column="4" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Export Button -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+            <Button Content="Export to CSV" Command="{Binding ExportToCSVCommand}" Background="#007AFF" Foreground="White" Padding="15,10" />
+        </StackPanel>
+    </Grid>
+</UserControl>

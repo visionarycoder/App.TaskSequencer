@@ -1,7 +1,4 @@
-﻿using Android.App;
-using Android.Runtime;
-
-namespace App.TaskSequencer.Client.Desktop.Maui;
+﻿namespace App.TaskSequencer.Client.Desktop.Maui.Platforms.Android;
 
 [Application]
 public class MainApplication : MauiApplication

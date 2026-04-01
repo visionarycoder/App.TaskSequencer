@@ -7,7 +7,6 @@
     <File Path="App.TaskSequencer.code-workspace" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
-    <File Path="FEATURE_IMPLEMENTATION_PLAN.md" />
     <File Path="readme.md" />
     <File Path="start-all.bat" />
     <File Path="start-aspire.bat" />
@@ -17,7 +16,6 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Client.Desktop.Console/Client.Desktop.Console.csproj" />
-    <Project Path="src/Client.Desktop.Maui/Client.Desktop.Maui.csproj" />
     <Project Path="src/Core/Core.csproj" />
     <Project Path="src/Hosting.AspireHost/Hosting.AspireHost.csproj" Id="37a969fa-bb81-4052-9c59-1267fb9b511d" />
     <Project Path="src/Hosting.OrleansHost/Hosting.OrleansHost.csproj" Id="f3c541db-a038-4484-95d6-4b9a26760c82" />

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="Clinet.Desktop.WinUI.Views.TimelineView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20" RowSpacing="10">
+        <!-- Header -->
+        <StackPanel Spacing="5">
+            <TextBlock Text="Gantt Chart - Task Execution Timeline" FontSize="32" FontWeight="Bold" />
+            <TextBlock Text="{Binding StatusMessage}" FontSize="14" Foreground="Gray" />
+        </StackPanel>
+
+        <!-- Control Bar -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+            <Button Content="Zoom In" Command="{Binding ZoomInCommand}" Background="#007AFF" Foreground="White" Padding="10" />
+            <Button Content="Zoom Out" Command="{Binding ZoomOutCommand}" Background="#007AFF" Foreground="White" Padding="10" />
+            <TextBlock Text="{Binding TimelineStart, StringFormat='Start: {0:g}'}" VerticalAlignment="Center" FontSize="12" />
+            <TextBlock Text="{Binding TimelineEnd, StringFormat='End: {0:g}'}" VerticalAlignment="Center" FontSize="12" />
+        </StackPanel>
+
+        <!-- Timeline Container -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Spacing="5" Padding="10">
+                <!-- Gantt Chart Header -->
+                <Grid ColumnDefinitions="200,*" Padding="0,10" Background="#F0F0F0">
+                    <TextBlock Text="Task Name" FontSize="12" FontWeight="Bold" />
+                    <TextBlock Text="Timeline" Grid.Column="1" FontSize="12" FontWeight="Bold" />
+                </Grid>
+
+                <!-- Task Rows -->
+                <ItemsControl ItemsSource="{Binding ExecutionTasks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="200,*" Height="40" Margin="0,5" Background="#FAFAFA" Padding="5">
+                                <TextBlock Text="{Binding TaskName}" VerticalAlignment="Center" FontSize="11" />
+                                <TextBlock Grid.Column="1" Text="{Binding TaskId}" VerticalAlignment="Center" FontSize="11" Foreground="Gray" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="3" HorizontalAlignment="Center" Spacing="10">
+            <TextBlock Text="{Binding ExecutionTasks.Count, StringFormat='Showing {0} tasks'}" TextAlignment="Center" FontSize="12" />
+        </StackPanel>
+    </Grid>
+</UserControl>

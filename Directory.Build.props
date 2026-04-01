@@ -20,6 +20,9 @@
     <VersionSuffix></VersionSuffix>
     <InformationalVersion>$(VersionPrefix)</InformationalVersion>
 
+    <!-- Central Package Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
     <!-- Language and Runtime Settings -->
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>

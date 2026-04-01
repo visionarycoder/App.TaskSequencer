@@ -1,8 +1,6 @@
-using Core.Models;
 using System.Diagnostics;
-using Xunit;
 
-namespace Core.Orleans.Performance.Tests;
+namespace Core.Orleans.Performance;
 
 /// <summary>
 /// Test suite for performance optimization and scaling of distributed grain execution.
